@@ -15,6 +15,7 @@ import org.hibernate.criterion.Restrictions;
 import com.adms.batch.kpireport.enums.EFileFormat;
 import com.adms.batch.kpireport.service.DataImporter;
 import com.adms.batch.kpireport.util.AppConfig;
+import com.adms.batch.kpireport.util.NewTimeFormatHelper;
 import com.adms.entity.ListLot;
 import com.adms.entity.Tsr;
 import com.adms.entity.TsrTracking;
@@ -63,7 +64,8 @@ public class TsrTrackingImporter implements DataImporter {
 			}
 			
 		} catch(Exception e) {
-			logger.error(e.getMessage(), e);
+//			logger.error(e.getMessage(), e);
+			e.printStackTrace();
 		} finally {
 			try { fileformatStream.close(); } catch(Exception e) {}
 			try { wbStream.close(); } catch(Exception e) {}
@@ -75,6 +77,10 @@ public class TsrTrackingImporter implements DataImporter {
 			String period = sheetHolder.get("period").getStringValue().trim().substring(0, 10);
 			String listLotName = sheetHolder.get("listLotName").getStringValue();
 			List<DataHolder> datas = sheetHolder.getDataList("tsrTrackingList");
+			String hoursFormat = sheetHolder.get("hoursFormat").getStringValue();
+			
+			//TODO Temporary setup
+			NewTimeFormatHelper.getInstance().setThisFileIsNewTimeFormat(hoursFormat.contains("hh.mm"));
 			
 //			<!-- getting Listlot -->
 			if(listLotName.contains(",")) { logger.info("SKIP>> sheetName:" + sheetName + " | listLotName: " + listLotName + " | period: " + period); return;}
@@ -146,8 +152,13 @@ public class TsrTrackingImporter implements DataImporter {
 				.add(Restrictions.eq("tsr.tsrCode", tsr == null ? "" : tsr.getTsrCode())));
 
 		List<TsrTracking> list = tsrTrackingService.findByCriteria(isExisted);
+		ListLot listLot = listLotService.find(new ListLot(listLotCode)).get(0);
 		
 		TsrTracking tsrTracking = null;
+		
+		double hoursBase100 = NewTimeFormatHelper.getInstance().getTimeBase100(listLot.getCampaign().getCampaignCode(), hours).doubleValue();
+		double talkTimeBase100 = NewTimeFormatHelper.getInstance().getTimeBase100(listLot.getCampaign().getCampaignCode(), talkTime).doubleValue();
+		
 		if(list.isEmpty()) {
 			tsrTracking = new TsrTracking();
 			tsrTracking.setTrackingDate(trackingDate);
@@ -156,9 +167,9 @@ public class TsrTrackingImporter implements DataImporter {
 			tsrTracking.setWorkDays(workday);
 			tsrTracking.setListUsed(listUsed);
 			tsrTracking.setComplete(complete);
-			tsrTracking.setListLot(listLotService.find(new ListLot(listLotCode)).get(0));
-			tsrTracking.setWorkHours(hours.doubleValue());
-			tsrTracking.setTotalTalkTime(talkTime.doubleValue());
+			tsrTracking.setListLot(listLot);
+			tsrTracking.setWorkHours(hoursBase100);
+			tsrTracking.setTotalTalkTime(talkTimeBase100);
 			tsrTracking.setNewUsed(newUsed);
 			tsrTracking.setTotalPolicy(totalPolicy);
 			
@@ -179,12 +190,12 @@ public class TsrTrackingImporter implements DataImporter {
 				tsrTracking.setComplete(complete);
 				isUpdate = true;
 			}
-			if(!tsrTracking.getWorkHours().equals(hours.doubleValue())) {
-				tsrTracking.setWorkHours(hours.doubleValue());
+			if(!tsrTracking.getWorkHours().equals(hoursBase100)) {
+				tsrTracking.setWorkHours(hoursBase100);
 				isUpdate = true;
 			}
-			if(!tsrTracking.getTotalTalkTime().equals(talkTime.doubleValue())) {
-				tsrTracking.setTotalTalkTime(talkTime.doubleValue());
+			if(!tsrTracking.getTotalTalkTime().equals(talkTimeBase100)) {
+				tsrTracking.setTotalTalkTime(talkTimeBase100);
 				isUpdate = true;
 			}
 			if(!tsrTracking.getNewUsed().equals(newUsed)) {

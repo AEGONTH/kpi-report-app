@@ -5,6 +5,8 @@
 			<DataCell row="1" column="A" dataType="TEXT" fieldName="reportName" />
 			<DataCell row="2" column="C" dataType="TEXT" fieldName="listLotName" />
 			<DataCell row="3" column="C" dataType="TEXT" fieldName="period" />
+			
+			<DataCell row="8" column="AC" dataType="TEXT" fieldName="hoursFormat" />
 
 			<DataRecord listSourceName="tsrTrackingList" beginRow="8" endRow="1000">
 			
@@ -29,6 +31,8 @@
 			<DataCell row="1" column="A" dataType="TEXT" fieldName="reportName" />
 			<DataCell row="2" column="C" dataType="TEXT" fieldName="listLotName" />
 			<DataCell row="3" column="C" dataType="TEXT" fieldName="period" />
+			
+			<DataCell row="8" column="AC" dataType="TEXT" fieldName="hoursFormat" />
 
 			<DataRecord listSourceName="tsrTrackingList" beginRow="8" endRow="1000">
 			
@@ -53,6 +57,8 @@
 			<DataCell row="1" column="A" dataType="TEXT" fieldName="reportName" />
 			<DataCell row="2" column="C" dataType="TEXT" fieldName="listLotName" />
 			<DataCell row="3" column="C" dataType="TEXT" fieldName="period" />
+			
+			<DataCell row="8" column="AC" dataType="TEXT" fieldName="hoursFormat" />
 
 			<DataRecord listSourceName="tsrTrackingList" beginRow="8" endRow="1000">
 			
@@ -75,6 +81,8 @@
 			<DataCell row="1" column="A" dataType="TEXT" fieldName="reportName" />
 			<DataCell row="2" column="C" dataType="TEXT" fieldName="listLotName" />
 			<DataCell row="3" column="C" dataType="TEXT" fieldName="period" />
+			
+			<DataCell row="8" column="AC" dataType="TEXT" fieldName="hoursFormat" />
 
 			<DataRecord listSourceName="tsrTrackingList" beginRow="8" endRow="1000">
 			
@@ -97,6 +105,8 @@
 			<DataCell row="1" column="A" dataType="TEXT" fieldName="reportName" />
 			<DataCell row="2" column="C" dataType="TEXT" fieldName="listLotName" />
 			<DataCell row="3" column="C" dataType="TEXT" fieldName="period" />
+			
+			<DataCell row="8" column="AC" dataType="TEXT" fieldName="hoursFormat" />
 
 			<DataRecord listSourceName="tsrTrackingList" beginRow="8" endRow="1000">
 			
@@ -119,6 +129,8 @@
 			<DataCell row="1" column="A" dataType="TEXT" fieldName="reportName" />
 			<DataCell row="2" column="C" dataType="TEXT" fieldName="listLotName" />
 			<DataCell row="3" column="C" dataType="TEXT" fieldName="period" />
+			
+			<DataCell row="8" column="AC" dataType="TEXT" fieldName="hoursFormat" />
 
 			<DataRecord listSourceName="tsrTrackingList" beginRow="8" endRow="1000">
 			
@@ -141,6 +153,8 @@
 			<DataCell row="1" column="A" dataType="TEXT" fieldName="reportName" />
 			<DataCell row="2" column="C" dataType="TEXT" fieldName="listLotName" />
 			<DataCell row="3" column="C" dataType="TEXT" fieldName="period" />
+			
+			<DataCell row="8" column="AC" dataType="TEXT" fieldName="hoursFormat" />
 
 			<DataRecord listSourceName="tsrTrackingList" beginRow="8" endRow="1000">
 			
@@ -163,6 +177,8 @@
 			<DataCell row="1" column="A" dataType="TEXT" fieldName="reportName" />
 			<DataCell row="2" column="C" dataType="TEXT" fieldName="listLotName" />
 			<DataCell row="3" column="C" dataType="TEXT" fieldName="period" />
+			
+			<DataCell row="8" column="AC" dataType="TEXT" fieldName="hoursFormat" />
 
 			<DataRecord listSourceName="tsrTrackingList" beginRow="8" endRow="1000">
 			
