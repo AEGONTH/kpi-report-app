@@ -18,7 +18,7 @@ import com.adms.utils.Logger;
 
 public class SupDsmImporter implements DataImporter {
 	
-	private final String LOGIN_USER = "SUP_DSM_IMPORTER";
+	private final String LOGIN_USER = "System Admin";
 	
 	private static Logger logger = Logger.getLogger();
 
