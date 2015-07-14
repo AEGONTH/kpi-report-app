@@ -84,11 +84,16 @@ public class TsrTrackingImporter implements DataImporter {
 			
 //			<!-- getting Listlot -->
 			if(listLotName.contains(",")) { logger.info("SKIP>> sheetName:" + sheetName + " | listLotName: " + listLotName + " | period: " + period); return;}
+			logger.info("## Do sheet: " + sheetName + " | listLotName: " + listLotName + " | period: " + period); 
 			
 			String listLotCode = getListLotCode(listLotName);
 			if(StringUtils.isBlank(listLotCode)) throw new Exception("Cannot get listlot >> " + listLotName + " | period: " + period);
+
+			logger.info("# Retrived: " + datas.size() + " records");
 			
-			if(datas.isEmpty()) return;
+			if(datas.isEmpty()) {
+				return;
+			}
 			
 			for(DataHolder data : datas) {
 				try {
@@ -119,7 +124,7 @@ public class TsrTrackingImporter implements DataImporter {
 //					<!-- get Tsr by name -->
 					String fullName = removeTitle(tsrName.replaceAll(" ", "").replaceAll("  ", " "));
 					Tsr tsr = getTsrByName(fullName);
-					if(tsr == null) logger.info("Not found TSR: '" + fullName + "' | listLot: " + listLotCode);
+					if(tsr == null) logger.info("Not found TSR Code: '" + fullName + "' | listLot: " + listLotCode);
 					
 					Date trackingDate = null;
 					try {
@@ -156,8 +161,8 @@ public class TsrTrackingImporter implements DataImporter {
 		
 		TsrTracking tsrTracking = null;
 		
-		double hoursBase100 = NewTimeFormatHelper.getInstance().getTimeBase100(listLot.getCampaign().getCampaignCode(), hours).doubleValue();
-		double talkTimeBase100 = NewTimeFormatHelper.getInstance().getTimeBase100(listLot.getCampaign().getCampaignCode(), talkTime).doubleValue();
+		BigDecimal hoursBase100 = NewTimeFormatHelper.getInstance().getTimeBase100(listLot.getCampaign().getCampaignCode(), hours).setScale(13, BigDecimal.ROUND_HALF_UP);
+		BigDecimal talkTimeBase100 = NewTimeFormatHelper.getInstance().getTimeBase100(listLot.getCampaign().getCampaignCode(), talkTime).setScale(13, BigDecimal.ROUND_HALF_UP);
 		
 		if(list.isEmpty()) {
 			tsrTracking = new TsrTracking();

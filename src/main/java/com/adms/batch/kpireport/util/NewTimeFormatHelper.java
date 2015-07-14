@@ -43,7 +43,7 @@ public class NewTimeFormatHelper {
 			result = new BigDecimal(time.doubleValue());
 		}
 		
-		return result.setScale(2, BigDecimal.ROUND_HALF_UP);
+		return result;
 	}
 	
 	public void setThisFileIsNewTimeFormat(boolean flag) {

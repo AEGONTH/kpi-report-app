@@ -34,7 +34,7 @@
 <!-- 		<property name="driverClassName" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/> 	-->
 		<property name="driverClassName" value="net.sourceforge.jtds.jdbcx.JtdsDataSource"/>
 		
-		<property name="url" value="jdbc:jtds:sqlserver://AEGONSRV04:1433;databaseName=SALES"/>
+		<property name="url" value="jdbc:jtds:sqlserver://10.66.0.12:1433;databaseName=SALES"/>
 		<property name="username" value="sa01"/>
 		<property name="password" value="Aegon03"/>
 		

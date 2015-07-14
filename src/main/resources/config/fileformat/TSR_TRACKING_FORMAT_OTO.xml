@@ -10,7 +10,7 @@
 
 			<DataRecord listSourceName="tsrTrackingList" beginRow="6" endRow="1000">
 			
-				<BeginRecordCondition column="F" comparator="EQ" checkValue="New" />
+				<BeginRecordCondition column="A" comparator="EQ" checkValue="1" firstRowAsData="TRUE"/>
 			
 				<DataCell row="1" column="B" dataType="TEXT" fieldName="tsrName" autoTrim="TRUE"/>
 				<DataCell row="1" column="C" dataType="NUMBER" fieldName="workday" />
@@ -36,7 +36,7 @@
 
 			<DataRecord listSourceName="tsrTrackingList" beginRow="6" endRow="1000">
 			
-				<BeginRecordCondition column="F" comparator="EQ" checkValue="New" />
+				<BeginRecordCondition column="A" comparator="EQ" checkValue="1" firstRowAsData="TRUE"/>
 			
 				<DataCell row="1" column="B" dataType="TEXT" fieldName="tsrName" autoTrim="TRUE"/>
 				<DataCell row="1" column="C" dataType="NUMBER" fieldName="workday" />
@@ -52,7 +52,7 @@
 				<EndRecordCondition column="A" comparator="BLANK" checkValue="" />
 			</DataRecord>
 		</DataSheet>
-
+		
 		<DataSheet sheetName="" sheetIndex="2" skipWhenNull="TRUE">
 			<DataCell row="1" column="A" dataType="TEXT" fieldName="reportName" />
 			<DataCell row="2" column="C" dataType="TEXT" fieldName="listLotName" />
@@ -61,6 +61,8 @@
 			<DataCell row="8" column="AC" dataType="TEXT" fieldName="hoursFormat" />
 
 			<DataRecord listSourceName="tsrTrackingList" beginRow="6" endRow="1000">
+			
+				<BeginRecordCondition column="A" comparator="EQ" checkValue="1" firstRowAsData="TRUE"/>
 			
 				<DataCell row="1" column="B" dataType="TEXT" fieldName="tsrName" autoTrim="TRUE"/>
 				<DataCell row="1" column="C" dataType="NUMBER" fieldName="workday" />
@@ -86,6 +88,8 @@
 
 			<DataRecord listSourceName="tsrTrackingList" beginRow="6" endRow="1000">
 			
+				<BeginRecordCondition column="A" comparator="EQ" checkValue="1" firstRowAsData="TRUE"/>
+			
 				<DataCell row="1" column="B" dataType="TEXT" fieldName="tsrName" autoTrim="TRUE"/>
 				<DataCell row="1" column="C" dataType="NUMBER" fieldName="workday" />
 				<DataCell row="1" column="D" dataType="NUMBER" fieldName="listUsed" />
@@ -109,6 +113,8 @@
 			<DataCell row="8" column="AC" dataType="TEXT" fieldName="hoursFormat" />
 
 			<DataRecord listSourceName="tsrTrackingList" beginRow="6" endRow="1000">
+			
+				<BeginRecordCondition column="A" comparator="EQ" checkValue="1" firstRowAsData="TRUE"/>
 			
 				<DataCell row="1" column="B" dataType="TEXT" fieldName="tsrName" autoTrim="TRUE"/>
 				<DataCell row="1" column="C" dataType="NUMBER" fieldName="workday" />
@@ -134,6 +140,8 @@
 
 			<DataRecord listSourceName="tsrTrackingList" beginRow="6" endRow="1000">
 			
+				<BeginRecordCondition column="A" comparator="EQ" checkValue="1" firstRowAsData="TRUE"/>
+			
 				<DataCell row="1" column="B" dataType="TEXT" fieldName="tsrName" autoTrim="TRUE"/>
 				<DataCell row="1" column="C" dataType="NUMBER" fieldName="workday" />
 				<DataCell row="1" column="D" dataType="NUMBER" fieldName="listUsed" />
@@ -155,8 +163,10 @@
 			<DataCell row="3" column="C" dataType="TEXT" fieldName="period" />
 			
 			<DataCell row="8" column="AC" dataType="TEXT" fieldName="hoursFormat" />
-
+			
 			<DataRecord listSourceName="tsrTrackingList" beginRow="6" endRow="1000">
+			
+				<BeginRecordCondition column="A" comparator="EQ" checkValue="1" firstRowAsData="TRUE"/>
 			
 				<DataCell row="1" column="B" dataType="TEXT" fieldName="tsrName" autoTrim="TRUE"/>
 				<DataCell row="1" column="C" dataType="NUMBER" fieldName="workday" />
@@ -181,6 +191,138 @@
 			<DataCell row="8" column="AC" dataType="TEXT" fieldName="hoursFormat" />
 
 			<DataRecord listSourceName="tsrTrackingList" beginRow="6" endRow="1000">
+			
+				<BeginRecordCondition column="A" comparator="EQ" checkValue="1" firstRowAsData="TRUE"/>
+			
+				<DataCell row="1" column="B" dataType="TEXT" fieldName="tsrName" autoTrim="TRUE"/>
+				<DataCell row="1" column="C" dataType="NUMBER" fieldName="workday" />
+				<DataCell row="1" column="D" dataType="NUMBER" fieldName="listUsed" />
+				<DataCell row="1" column="E" dataType="NUMBER" fieldName="complete" />
+				
+				<DataCell row="1" column="K" dataType="NUMBER" fieldName="newUsed" />
+				<DataCell row="1" column="T" dataType="NUMBER" fieldName="totalPolicy" />
+				
+				<DataCell row="1" column="AC" dataType="NUMBER" dataFormat="#,##0.00" fieldName="hours" />
+				<DataCell row="1" column="AG" dataType="NUMBER" dataFormat="#,##0.00" fieldName="totalTalkTime" />
+				
+				<EndRecordCondition column="A" comparator="BLANK" checkValue="" />
+			</DataRecord>
+		</DataSheet>
+
+		<DataSheet sheetName="" sheetIndex="8" skipWhenNull="TRUE">
+			<DataCell row="1" column="A" dataType="TEXT" fieldName="reportName" />
+			<DataCell row="2" column="C" dataType="TEXT" fieldName="listLotName" />
+			<DataCell row="3" column="C" dataType="TEXT" fieldName="period" />
+			
+			<DataCell row="8" column="AC" dataType="TEXT" fieldName="hoursFormat" />
+
+			<DataRecord listSourceName="tsrTrackingList" beginRow="6" endRow="1000">
+			
+				<BeginRecordCondition column="A" comparator="EQ" checkValue="1" firstRowAsData="TRUE"/>
+			
+				<DataCell row="1" column="B" dataType="TEXT" fieldName="tsrName" autoTrim="TRUE"/>
+				<DataCell row="1" column="C" dataType="NUMBER" fieldName="workday" />
+				<DataCell row="1" column="D" dataType="NUMBER" fieldName="listUsed" />
+				<DataCell row="1" column="E" dataType="NUMBER" fieldName="complete" />
+				
+				<DataCell row="1" column="K" dataType="NUMBER" fieldName="newUsed" />
+				<DataCell row="1" column="T" dataType="NUMBER" fieldName="totalPolicy" />
+				
+				<DataCell row="1" column="AC" dataType="NUMBER" dataFormat="#,##0.00" fieldName="hours" />
+				<DataCell row="1" column="AG" dataType="NUMBER" dataFormat="#,##0.00" fieldName="totalTalkTime" />
+				
+				<EndRecordCondition column="A" comparator="BLANK" checkValue="" />
+			</DataRecord>
+		</DataSheet>
+
+		<DataSheet sheetName="" sheetIndex="9" skipWhenNull="TRUE">
+			<DataCell row="1" column="A" dataType="TEXT" fieldName="reportName" />
+			<DataCell row="2" column="C" dataType="TEXT" fieldName="listLotName" />
+			<DataCell row="3" column="C" dataType="TEXT" fieldName="period" />
+			
+			<DataCell row="8" column="AC" dataType="TEXT" fieldName="hoursFormat" />
+
+			<DataRecord listSourceName="tsrTrackingList" beginRow="6" endRow="1000">
+			
+				<BeginRecordCondition column="A" comparator="EQ" checkValue="1" firstRowAsData="TRUE"/>
+			
+				<DataCell row="1" column="B" dataType="TEXT" fieldName="tsrName" autoTrim="TRUE"/>
+				<DataCell row="1" column="C" dataType="NUMBER" fieldName="workday" />
+				<DataCell row="1" column="D" dataType="NUMBER" fieldName="listUsed" />
+				<DataCell row="1" column="E" dataType="NUMBER" fieldName="complete" />
+				
+				<DataCell row="1" column="K" dataType="NUMBER" fieldName="newUsed" />
+				<DataCell row="1" column="T" dataType="NUMBER" fieldName="totalPolicy" />
+				
+				<DataCell row="1" column="AC" dataType="NUMBER" dataFormat="#,##0.00" fieldName="hours" />
+				<DataCell row="1" column="AG" dataType="NUMBER" dataFormat="#,##0.00" fieldName="totalTalkTime" />
+				
+				<EndRecordCondition column="A" comparator="BLANK" checkValue="" />
+			</DataRecord>
+		</DataSheet>
+
+		<DataSheet sheetName="" sheetIndex="10" skipWhenNull="TRUE">
+			<DataCell row="1" column="A" dataType="TEXT" fieldName="reportName" />
+			<DataCell row="2" column="C" dataType="TEXT" fieldName="listLotName" />
+			<DataCell row="3" column="C" dataType="TEXT" fieldName="period" />
+			
+			<DataCell row="8" column="AC" dataType="TEXT" fieldName="hoursFormat" />
+
+			<DataRecord listSourceName="tsrTrackingList" beginRow="6" endRow="1000">
+			
+				<BeginRecordCondition column="A" comparator="EQ" checkValue="1" firstRowAsData="TRUE"/>
+			
+				<DataCell row="1" column="B" dataType="TEXT" fieldName="tsrName" autoTrim="TRUE"/>
+				<DataCell row="1" column="C" dataType="NUMBER" fieldName="workday" />
+				<DataCell row="1" column="D" dataType="NUMBER" fieldName="listUsed" />
+				<DataCell row="1" column="E" dataType="NUMBER" fieldName="complete" />
+				
+				<DataCell row="1" column="K" dataType="NUMBER" fieldName="newUsed" />
+				<DataCell row="1" column="T" dataType="NUMBER" fieldName="totalPolicy" />
+				
+				<DataCell row="1" column="AC" dataType="NUMBER" dataFormat="#,##0.00" fieldName="hours" />
+				<DataCell row="1" column="AG" dataType="NUMBER" dataFormat="#,##0.00" fieldName="totalTalkTime" />
+				
+				<EndRecordCondition column="A" comparator="BLANK" checkValue="" />
+			</DataRecord>
+		</DataSheet>
+
+		<DataSheet sheetName="" sheetIndex="11" skipWhenNull="TRUE">
+			<DataCell row="1" column="A" dataType="TEXT" fieldName="reportName" />
+			<DataCell row="2" column="C" dataType="TEXT" fieldName="listLotName" />
+			<DataCell row="3" column="C" dataType="TEXT" fieldName="period" />
+			
+			<DataCell row="8" column="AC" dataType="TEXT" fieldName="hoursFormat" />
+
+			<DataRecord listSourceName="tsrTrackingList" beginRow="6" endRow="1000">
+			
+				<BeginRecordCondition column="A" comparator="EQ" checkValue="1" firstRowAsData="TRUE"/>
+			
+				<DataCell row="1" column="B" dataType="TEXT" fieldName="tsrName" autoTrim="TRUE"/>
+				<DataCell row="1" column="C" dataType="NUMBER" fieldName="workday" />
+				<DataCell row="1" column="D" dataType="NUMBER" fieldName="listUsed" />
+				<DataCell row="1" column="E" dataType="NUMBER" fieldName="complete" />
+				
+				<DataCell row="1" column="K" dataType="NUMBER" fieldName="newUsed" />
+				<DataCell row="1" column="T" dataType="NUMBER" fieldName="totalPolicy" />
+				
+				<DataCell row="1" column="AC" dataType="NUMBER" dataFormat="#,##0.00" fieldName="hours" />
+				<DataCell row="1" column="AG" dataType="NUMBER" dataFormat="#,##0.00" fieldName="totalTalkTime" />
+				
+				<EndRecordCondition column="A" comparator="BLANK" checkValue="" />
+			</DataRecord>
+		</DataSheet>
+
+		<DataSheet sheetName="" sheetIndex="12" skipWhenNull="TRUE">
+			<DataCell row="1" column="A" dataType="TEXT" fieldName="reportName" />
+			<DataCell row="2" column="C" dataType="TEXT" fieldName="listLotName" />
+			<DataCell row="3" column="C" dataType="TEXT" fieldName="period" />
+			
+			<DataCell row="8" column="AC" dataType="TEXT" fieldName="hoursFormat" />
+
+			<DataRecord listSourceName="tsrTrackingList" beginRow="6" endRow="1000">
+			
+				<BeginRecordCondition column="A" comparator="EQ" checkValue="1" firstRowAsData="TRUE"/>
 			
 				<DataCell row="1" column="B" dataType="TEXT" fieldName="tsrName" autoTrim="TRUE"/>
 				<DataCell row="1" column="C" dataType="NUMBER" fieldName="workday" />

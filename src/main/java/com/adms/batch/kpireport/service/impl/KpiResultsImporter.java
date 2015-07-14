@@ -45,19 +45,20 @@ public class KpiResultsImporter implements DataImporter {
 
 	private void addDataToKpiResult(String yearMonth) throws Exception {
 	
-	//		<!-- Delete old data -->
-			logger.info("## Clearing Old Data by YearMonth: " + yearMonth + " ##");
-			String hql = "delete from KpiResult where yearMonth = ?";
-			int n = kpiResultService.deleteByHql(hql, yearMonth);
-			logger.info("# Total: " + n + " records");
+//		<!-- Delete old data -->
+		logger.info("## Clearing Old Data by YearMonth: " + yearMonth + " ##");
+		String hql = "delete from KpiResult where yearMonth = ?";
+		int n = kpiResultService.deleteByHql(hql, yearMonth);
+		logger.info("# Deleted Total: " + n + " records");
+	
+		logger.info("## Adding data to KPI Result ##");
+//		<!-- get data -->
+		List<KpiBean> kpiBeanList = kpiBeanService.findByNamedQuery("getKpiBeanByDate", yearMonth);
+		logger.info("## Found data total: " + kpiBeanList.size() + " records");
 		
-			logger.info("## Adding data to KPI Result ##");
-	//		<!-- get data -->
-			List<KpiBean> kpiBeanList = kpiBeanService.findByNamedQuery("getKpiBeanByDate", yearMonth);
-			
-	//		<!-- Add to Kpi Result -->
-			logicKpiResult(kpiBeanList, yearMonth, FixMsigListLot.getInstance().getFixMisgListLotDelim(yearMonth));
-		}
+//		<!-- Add to Kpi Result -->
+		logicKpiResult(kpiBeanList, yearMonth, FixMsigListLot.getInstance().getFixMisgListLotDelim(yearMonth));
+	}
 
 	private void logicKpiResult(List<KpiBean> kpiBeans, String yearMonth, String delimKeyCodeMSIGWB) throws Exception {
 		try {

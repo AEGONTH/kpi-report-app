@@ -10,7 +10,7 @@
 
 			<DataRecord listSourceName="tsrTrackingList" beginRow="8" endRow="1000">
 			
-				<BeginRecordCondition column="F" comparator="EQ" checkValue="New" />
+				<BeginRecordCondition column="A" comparator="EQ" checkValue="1" firstRowAsData="TRUE"/>
 			
 				<DataCell row="1" column="B" dataType="TEXT" fieldName="tsrName" autoTrim="TRUE"/>
 				<DataCell row="1" column="C" dataType="NUMBER" fieldName="workday" />
@@ -36,7 +36,7 @@
 
 			<DataRecord listSourceName="tsrTrackingList" beginRow="8" endRow="1000">
 			
-				<BeginRecordCondition column="F" comparator="EQ" checkValue="New" />
+				<BeginRecordCondition column="A" comparator="EQ" checkValue="1" firstRowAsData="TRUE"/>
 			
 				<DataCell row="1" column="B" dataType="TEXT" fieldName="tsrName" autoTrim="TRUE"/>
 				<DataCell row="1" column="C" dataType="NUMBER" fieldName="workday" />
@@ -62,6 +62,8 @@
 
 			<DataRecord listSourceName="tsrTrackingList" beginRow="8" endRow="1000">
 			
+				<BeginRecordCondition column="A" comparator="EQ" checkValue="1" firstRowAsData="TRUE"/>
+			
 				<DataCell row="1" column="B" dataType="TEXT" fieldName="tsrName" autoTrim="TRUE"/>
 				<DataCell row="1" column="C" dataType="NUMBER" fieldName="workday" />
 				<DataCell row="1" column="D" dataType="NUMBER" fieldName="listUsed" />
@@ -85,6 +87,8 @@
 			<DataCell row="8" column="AC" dataType="TEXT" fieldName="hoursFormat" />
 
 			<DataRecord listSourceName="tsrTrackingList" beginRow="8" endRow="1000">
+			
+				<BeginRecordCondition column="A" comparator="EQ" checkValue="1" firstRowAsData="TRUE"/>
 			
 				<DataCell row="1" column="B" dataType="TEXT" fieldName="tsrName" autoTrim="TRUE"/>
 				<DataCell row="1" column="C" dataType="NUMBER" fieldName="workday" />
@@ -110,6 +114,8 @@
 
 			<DataRecord listSourceName="tsrTrackingList" beginRow="8" endRow="1000">
 			
+				<BeginRecordCondition column="A" comparator="EQ" checkValue="1" firstRowAsData="TRUE"/>
+			
 				<DataCell row="1" column="B" dataType="TEXT" fieldName="tsrName" autoTrim="TRUE"/>
 				<DataCell row="1" column="C" dataType="NUMBER" fieldName="workday" />
 				<DataCell row="1" column="D" dataType="NUMBER" fieldName="listUsed" />
@@ -133,6 +139,8 @@
 			<DataCell row="8" column="AC" dataType="TEXT" fieldName="hoursFormat" />
 
 			<DataRecord listSourceName="tsrTrackingList" beginRow="8" endRow="1000">
+			
+				<BeginRecordCondition column="A" comparator="EQ" checkValue="1" firstRowAsData="TRUE"/>
 			
 				<DataCell row="1" column="B" dataType="TEXT" fieldName="tsrName" autoTrim="TRUE"/>
 				<DataCell row="1" column="C" dataType="NUMBER" fieldName="workday" />
@@ -158,6 +166,8 @@
 
 			<DataRecord listSourceName="tsrTrackingList" beginRow="8" endRow="1000">
 			
+				<BeginRecordCondition column="A" comparator="EQ" checkValue="1" firstRowAsData="TRUE"/>
+			
 				<DataCell row="1" column="B" dataType="TEXT" fieldName="tsrName" autoTrim="TRUE"/>
 				<DataCell row="1" column="C" dataType="NUMBER" fieldName="workday" />
 				<DataCell row="1" column="D" dataType="NUMBER" fieldName="listUsed" />
@@ -181,6 +191,8 @@
 			<DataCell row="8" column="AC" dataType="TEXT" fieldName="hoursFormat" />
 
 			<DataRecord listSourceName="tsrTrackingList" beginRow="8" endRow="1000">
+			
+				<BeginRecordCondition column="A" comparator="EQ" checkValue="1" firstRowAsData="TRUE"/>
 			
 				<DataCell row="1" column="B" dataType="TEXT" fieldName="tsrName" autoTrim="TRUE"/>
 				<DataCell row="1" column="C" dataType="NUMBER" fieldName="workday" />
