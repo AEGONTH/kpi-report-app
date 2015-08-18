@@ -1,6 +1,7 @@
 package com.adms.batch.kpireport.app;
 
 import com.adms.batch.kpireport.job.ImportJob;
+import com.adms.utils.DateUtil;
 import com.adms.utils.Logger;
 
 public class ImportTracking {
@@ -9,7 +10,8 @@ public class ImportTracking {
 
 	public static void main(String[] args) {
 		try {
-			String processDate = args[0];
+			String yyyyMM = args[0];
+			String processDate = DateUtil.convDateToString("yyyyMMdd", DateUtil.toEndOfMonth(DateUtil.convStringToDate("yyyyMMdd", yyyyMM + "01")));
 			logger.info("processDate: " + processDate);
 			
 			String rootPath = args[1];

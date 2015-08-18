@@ -8,6 +8,12 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.util.CellReference;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
@@ -59,8 +65,10 @@ public class TsrTrackingImporter implements DataImporter {
 				return;
 			}
 			
+			boolean flagTimeFormat = isNewTimeFormat(path);
+			
 			for(String sheetName : sheetNames) {
-				logic(wbHolder.get(sheetName), sheetName);
+				logic(wbHolder.get(sheetName), sheetName, flagTimeFormat);
 			}
 			
 		} catch(Exception e) {
@@ -72,7 +80,50 @@ public class TsrTrackingImporter implements DataImporter {
 		}
 	}
 	
-	private void logic(DataHolder sheetHolder, String sheetName) {
+	private boolean isNewTimeFormat(String dir) {
+		boolean flag = false;
+		String criteria = "hh.mm";
+		
+		InputStream is = null;
+		Workbook wb = null;
+		try {
+			is = new FileInputStream(dir);
+			wb = WorkbookFactory.create(is);
+			Sheet sheet = wb.getSheetAt(0);
+			Cell cell = sheet.getRow(7).getCell(CellReference.convertColStringToIndex("AC"), Row.CREATE_NULL_AS_BLANK);
+			String val = cell.getStringCellValue();
+			
+			if(val.contains(criteria)) {
+				flag = true;
+			}
+			
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {wb.close();}catch(Exception e) {}
+		}
+		
+		return flag;
+	}
+	
+	private BigDecimal getTimeBase100(DataHolder obj, boolean flagFormat) {
+		BigDecimal result = null;
+		if(obj != null) {
+			BigDecimal time = obj.getDecimalValue();
+			if(flagFormat) {
+				Double mm = time.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue() % 1 * 100;
+				BigDecimal base100 = new BigDecimal(mm / 60 * 100).setScale(0, BigDecimal.ROUND_FLOOR).divide(new BigDecimal(100));
+				result = time.setScale(0, BigDecimal.ROUND_FLOOR).add(base100);
+			} else {
+				result = time.setScale(14, BigDecimal.ROUND_HALF_UP);
+			}
+		} else {
+			result = BigDecimal.ZERO;
+		}
+		return result;
+	}
+	
+	private void logic(DataHolder sheetHolder, String sheetName, boolean isNewTimeFormat) {
 		try {
 			String period = sheetHolder.get("period").getStringValue().trim().substring(0, 10);
 			String listLotName = sheetHolder.get("listLotName").getStringValue();
@@ -115,8 +166,10 @@ public class TsrTrackingImporter implements DataImporter {
 					Integer complete = data.get("complete") != null ? data.get("complete").getIntValue() : new Integer(0);
 //					listUsed, complete
 					
-					BigDecimal hours = data.get("hours") != null ? data.get("hours").getDecimalValue().setScale(14, BigDecimal.ROUND_HALF_UP) : new BigDecimal(0);
-					BigDecimal talkTime = new BigDecimal(data.get("totalTalkTime").getStringValue()).setScale(14, BigDecimal.ROUND_HALF_UP);
+//					hours = data.get("hours") != null ? data.get("hours").getDecimalValue().setScale(14, BigDecimal.ROUND_HALF_UP) : new BigDecimal(0);
+					BigDecimal hours = getTimeBase100(data.get("hours"), isNewTimeFormat);
+//					BigDecimal talkTime = new BigDecimal(data.get("totalTalkTime").getStringValue()).setScale(14, BigDecimal.ROUND_HALF_UP);
+					BigDecimal talkTime = getTimeBase100(data.get("totalTalkTime"), isNewTimeFormat);
 					
 					Integer newUsed = data.get("newUsed") != null ? data.get("newUsed").getIntValue() : 0;
 					Integer totalPolicy = data.get("totalPolicy") != null ? data.get("totalPolicy").getIntValue() : 0;
