@@ -109,7 +109,6 @@ public class KpiReportExporter implements ReportExporter {
 			 * loop for retrieving data tree
 			 */
 			for(KpiResult kpiResult : kpiResults) {
-				
 //				<!-- for All DSM Code list -->
 				if(kpiResult.getDsm() == null) throw new Exception("DSM not found ==> campaignCode: " + kpiResult.getCampaign().getCampaignCode());
 				

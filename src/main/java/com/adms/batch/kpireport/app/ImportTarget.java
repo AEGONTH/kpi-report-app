@@ -1,6 +1,7 @@
 package com.adms.batch.kpireport.app;
 
-import com.adms.batch.kpireport.job.ImportJob;
+import com.adms.batch.kpireport.service.DataImporter;
+import com.adms.batch.kpireport.service.impl.KpiTargetSetupImporter;
 import com.adms.utils.DateUtil;
 import com.adms.utils.Logger;
 
@@ -15,7 +16,10 @@ public class ImportTarget {
 			
 			String filePath = args[1];
 			logger.setLogFileName(args[2]);
-			ImportJob.getInstance(processDate).importKpiTargetSetup(filePath);
+			
+			DataImporter importer = new KpiTargetSetupImporter();
+			importer.importData(filePath, processDate);
+			logger.info("## Finished ##");
 		} catch(Exception e) {
 			logger.error(e.getMessage(), e);
 		}

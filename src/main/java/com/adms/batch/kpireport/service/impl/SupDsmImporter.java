@@ -64,26 +64,32 @@ public class SupDsmImporter implements DataImporter {
 				
 				tsrHierarchyService.add(tsrHierarchy, LOGIN_USER);
 			}
+			logger.info("Imported: " + dataList.size() + " records");
 			
 		} catch(Exception e) {
 			logger.error(e.getMessage(), e);
 		} finally {
 			try { is.close(); } catch(Exception e) {}
 			try { formatStream.close(); } catch(Exception e) {}
+			logger.info("##### FINISH #####");
 		}
 		
 	}
 	
 	private void deleteHirarchyByDate(final String processDate) throws Exception {
-		String hql = "from TsrHierarchy d "
-				+ " where 1 = 1 "
-				+ " and CONVERT(nvarchar(6), d.effectiveDate, 112) = ? "
-				+ " and CONVERT(nvarchar(6), d.endDate, 112) = ? ";
-		List<TsrHierarchy> list = this.tsrHierarchyService.findByHql(hql, processDate, processDate);
-		for(TsrHierarchy t : list) {
-			this.tsrHierarchyService.delete(t);
-		}
-		
+		String effectiveDate = processDate.substring(0, 6) + "01";
+//		String endDate = processDate.substring(0, 8);
+//		String hql = "from TsrHierarchy d "
+//				+ " where 1 = 1 "
+//				+ " and CONVERT(nvarchar(8), d.effectiveDate, 112) = ? "
+//				+ " and CONVERT(nvarchar(8), d.endDate, 112) = ? ";
+//		List<TsrHierarchy> list = this.tsrHierarchyService.findByHql(hql, effectiveDate, endDate);
+//		for(TsrHierarchy t : list) {
+//			this.tsrHierarchyService.delete(t);
+//		}
+		String hql = "delete from TsrHierarchy where CONVERT(nvarchar(8), effectiveDate, 112) = ?";
+		int deleted = tsrHierarchyService.delete(hql, effectiveDate);
+		logger.info("deleted: " + deleted + " records");
 	}
 
 }

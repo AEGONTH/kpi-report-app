@@ -15,8 +15,10 @@ public class ImportKpiResults {
 			String processDate = DateUtil.convDateToString("yyyyMMdd", DateUtil.toEndOfMonth(DateUtil.convStringToDate("yyyyMMdd", yyyyMM + "01")));
 			logger.setLogFileName(args[1]);
 			
+			logger.info("### Start Import Kpi Results");
 			DataImporter importer = new KpiResultsImporter();
 			importer.importData(null, processDate);
+			logger.info("### Finish Import Kpi Results");
 		} catch(Exception e) {
 			logger.error(e.getMessage(), e);
 		}

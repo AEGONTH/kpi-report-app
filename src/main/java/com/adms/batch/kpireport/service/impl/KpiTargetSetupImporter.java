@@ -74,6 +74,7 @@ public class KpiTargetSetupImporter implements DataImporter {
 		} finally {
 			try {is.close();} catch (IOException e) {}
 			try {fileFormatStream.close();} catch (IOException e) {}
+			logger.info("########## Finish ##########");
 		}
 		
 	}

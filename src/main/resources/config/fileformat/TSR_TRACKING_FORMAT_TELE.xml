@@ -16,6 +16,10 @@
 				<DataCell row="1" column="C" dataType="NUMBER" fieldName="workday" />
 				<DataCell row="1" column="D" dataType="NUMBER" fieldName="listUsed" />
 				<DataCell row="1" column="E" dataType="NUMBER" fieldName="complete" />
+				<DataCell row="1" column="F" dataType="NUMBER" fieldName="remainingNew" />
+				<DataCell row="1" column="G" dataType="NUMBER" fieldName="remainingCallBack" />
+				<DataCell row="1" column="H" dataType="NUMBER" fieldName="remainingNoContact" />
+				<DataCell row="1" column="I" dataType="NUMBER" fieldName="remainingFollowUp" />
 				
 				<DataCell row="1" column="K" dataType="NUMBER" fieldName="newUsed" />
 				<DataCell row="1" column="T" dataType="NUMBER" fieldName="totalPolicy" />
@@ -27,7 +31,7 @@
 			</DataRecord>
 		</DataSheet>
 
-		<DataSheet sheetName="" sheetIndex="1" skipWhenNull="TRUE">
+		<DataSheet sheetName="" sheetIndexs="1-11" skipWhenNull="TRUE">
 			<DataCell row="1" column="A" dataType="TEXT" fieldName="reportName" />
 			<DataCell row="2" column="C" dataType="TEXT" fieldName="listLotName" />
 			<DataCell row="3" column="C" dataType="TEXT" fieldName="period" />
@@ -42,6 +46,10 @@
 				<DataCell row="1" column="C" dataType="NUMBER" fieldName="workday" />
 				<DataCell row="1" column="D" dataType="NUMBER" fieldName="listUsed" />
 				<DataCell row="1" column="E" dataType="NUMBER" fieldName="complete" />
+				<DataCell row="1" column="F" dataType="NUMBER" fieldName="remainingNew" />
+				<DataCell row="1" column="G" dataType="NUMBER" fieldName="remainingCallBack" />
+				<DataCell row="1" column="H" dataType="NUMBER" fieldName="remainingNoContact" />
+				<DataCell row="1" column="I" dataType="NUMBER" fieldName="remainingFollowUp" />
 				
 				<DataCell row="1" column="K" dataType="NUMBER" fieldName="newUsed" />
 				<DataCell row="1" column="T" dataType="NUMBER" fieldName="totalPolicy" />
@@ -49,162 +57,6 @@
 				<DataCell row="1" column="AC" dataType="NUMBER" dataFormat="#,##0.00" fieldName="hours" />
 				<DataCell row="1" column="AG" dataType="NUMBER" dataFormat="#,##0.00" fieldName="totalTalkTime" />
 
-				<EndRecordCondition column="A" comparator="BLANK" checkValue="" />
-			</DataRecord>
-		</DataSheet>
-
-		<DataSheet sheetName="" sheetIndex="2" skipWhenNull="TRUE">
-			<DataCell row="1" column="A" dataType="TEXT" fieldName="reportName" />
-			<DataCell row="2" column="C" dataType="TEXT" fieldName="listLotName" />
-			<DataCell row="3" column="C" dataType="TEXT" fieldName="period" />
-			
-			<DataCell row="8" column="AC" dataType="TEXT" fieldName="hoursFormat" />
-
-			<DataRecord listSourceName="tsrTrackingList" beginRow="8" endRow="1000">
-			
-				<BeginRecordCondition column="A" comparator="EQ" checkValue="1" firstRowAsData="TRUE"/>
-			
-				<DataCell row="1" column="B" dataType="TEXT" fieldName="tsrName" autoTrim="TRUE"/>
-				<DataCell row="1" column="C" dataType="NUMBER" fieldName="workday" />
-				<DataCell row="1" column="D" dataType="NUMBER" fieldName="listUsed" />
-				<DataCell row="1" column="E" dataType="NUMBER" fieldName="complete" />
-				
-				<DataCell row="1" column="K" dataType="NUMBER" fieldName="newUsed" />
-				<DataCell row="1" column="T" dataType="NUMBER" fieldName="totalPolicy" />
-				
-				<DataCell row="1" column="AC" dataType="NUMBER" dataFormat="#,##0.00" fieldName="hours" />
-				<DataCell row="1" column="AG" dataType="NUMBER" dataFormat="#,##0.00" fieldName="totalTalkTime" />
-				
-				<EndRecordCondition column="A" comparator="BLANK" checkValue="" />
-			</DataRecord>
-		</DataSheet>
-
-		<DataSheet sheetName="" sheetIndex="3" skipWhenNull="TRUE">
-			<DataCell row="1" column="A" dataType="TEXT" fieldName="reportName" />
-			<DataCell row="2" column="C" dataType="TEXT" fieldName="listLotName" />
-			<DataCell row="3" column="C" dataType="TEXT" fieldName="period" />
-			
-			<DataCell row="8" column="AC" dataType="TEXT" fieldName="hoursFormat" />
-
-			<DataRecord listSourceName="tsrTrackingList" beginRow="8" endRow="1000">
-			
-				<BeginRecordCondition column="A" comparator="EQ" checkValue="1" firstRowAsData="TRUE"/>
-			
-				<DataCell row="1" column="B" dataType="TEXT" fieldName="tsrName" autoTrim="TRUE"/>
-				<DataCell row="1" column="C" dataType="NUMBER" fieldName="workday" />
-				<DataCell row="1" column="D" dataType="NUMBER" fieldName="listUsed" />
-				<DataCell row="1" column="E" dataType="NUMBER" fieldName="complete" />
-				
-				<DataCell row="1" column="K" dataType="NUMBER" fieldName="newUsed" />
-				<DataCell row="1" column="T" dataType="NUMBER" fieldName="totalPolicy" />
-				
-				<DataCell row="1" column="AC" dataType="NUMBER" dataFormat="#,##0.00" fieldName="hours" />
-				<DataCell row="1" column="AG" dataType="NUMBER" dataFormat="#,##0.00" fieldName="totalTalkTime" />
-				
-				<EndRecordCondition column="A" comparator="BLANK" checkValue="" />
-			</DataRecord>
-		</DataSheet>
-
-		<DataSheet sheetName="" sheetIndex="4" skipWhenNull="TRUE">
-			<DataCell row="1" column="A" dataType="TEXT" fieldName="reportName" />
-			<DataCell row="2" column="C" dataType="TEXT" fieldName="listLotName" />
-			<DataCell row="3" column="C" dataType="TEXT" fieldName="period" />
-			
-			<DataCell row="8" column="AC" dataType="TEXT" fieldName="hoursFormat" />
-
-			<DataRecord listSourceName="tsrTrackingList" beginRow="8" endRow="1000">
-			
-				<BeginRecordCondition column="A" comparator="EQ" checkValue="1" firstRowAsData="TRUE"/>
-			
-				<DataCell row="1" column="B" dataType="TEXT" fieldName="tsrName" autoTrim="TRUE"/>
-				<DataCell row="1" column="C" dataType="NUMBER" fieldName="workday" />
-				<DataCell row="1" column="D" dataType="NUMBER" fieldName="listUsed" />
-				<DataCell row="1" column="E" dataType="NUMBER" fieldName="complete" />
-				
-				<DataCell row="1" column="K" dataType="NUMBER" fieldName="newUsed" />
-				<DataCell row="1" column="T" dataType="NUMBER" fieldName="totalPolicy" />
-				
-				<DataCell row="1" column="AC" dataType="NUMBER" dataFormat="#,##0.00" fieldName="hours" />
-				<DataCell row="1" column="AG" dataType="NUMBER" dataFormat="#,##0.00" fieldName="totalTalkTime" />
-				
-				<EndRecordCondition column="A" comparator="BLANK" checkValue="" />
-			</DataRecord>
-		</DataSheet>
-
-		<DataSheet sheetName="" sheetIndex="5" skipWhenNull="TRUE">
-			<DataCell row="1" column="A" dataType="TEXT" fieldName="reportName" />
-			<DataCell row="2" column="C" dataType="TEXT" fieldName="listLotName" />
-			<DataCell row="3" column="C" dataType="TEXT" fieldName="period" />
-			
-			<DataCell row="8" column="AC" dataType="TEXT" fieldName="hoursFormat" />
-
-			<DataRecord listSourceName="tsrTrackingList" beginRow="8" endRow="1000">
-			
-				<BeginRecordCondition column="A" comparator="EQ" checkValue="1" firstRowAsData="TRUE"/>
-			
-				<DataCell row="1" column="B" dataType="TEXT" fieldName="tsrName" autoTrim="TRUE"/>
-				<DataCell row="1" column="C" dataType="NUMBER" fieldName="workday" />
-				<DataCell row="1" column="D" dataType="NUMBER" fieldName="listUsed" />
-				<DataCell row="1" column="E" dataType="NUMBER" fieldName="complete" />
-				
-				<DataCell row="1" column="K" dataType="NUMBER" fieldName="newUsed" />
-				<DataCell row="1" column="T" dataType="NUMBER" fieldName="totalPolicy" />
-				
-				<DataCell row="1" column="AC" dataType="NUMBER" dataFormat="#,##0.00" fieldName="hours" />
-				<DataCell row="1" column="AG" dataType="NUMBER" dataFormat="#,##0.00" fieldName="totalTalkTime" />
-				
-				<EndRecordCondition column="A" comparator="BLANK" checkValue="" />
-			</DataRecord>
-		</DataSheet>
-
-		<DataSheet sheetName="" sheetIndex="6" skipWhenNull="TRUE">
-			<DataCell row="1" column="A" dataType="TEXT" fieldName="reportName" />
-			<DataCell row="2" column="C" dataType="TEXT" fieldName="listLotName" />
-			<DataCell row="3" column="C" dataType="TEXT" fieldName="period" />
-			
-			<DataCell row="8" column="AC" dataType="TEXT" fieldName="hoursFormat" />
-
-			<DataRecord listSourceName="tsrTrackingList" beginRow="8" endRow="1000">
-			
-				<BeginRecordCondition column="A" comparator="EQ" checkValue="1" firstRowAsData="TRUE"/>
-			
-				<DataCell row="1" column="B" dataType="TEXT" fieldName="tsrName" autoTrim="TRUE"/>
-				<DataCell row="1" column="C" dataType="NUMBER" fieldName="workday" />
-				<DataCell row="1" column="D" dataType="NUMBER" fieldName="listUsed" />
-				<DataCell row="1" column="E" dataType="NUMBER" fieldName="complete" />
-				
-				<DataCell row="1" column="K" dataType="NUMBER" fieldName="newUsed" />
-				<DataCell row="1" column="T" dataType="NUMBER" fieldName="totalPolicy" />
-				
-				<DataCell row="1" column="AC" dataType="NUMBER" dataFormat="#,##0.00" fieldName="hours" />
-				<DataCell row="1" column="AG" dataType="NUMBER" dataFormat="#,##0.00" fieldName="totalTalkTime" />
-				
-				<EndRecordCondition column="A" comparator="BLANK" checkValue="" />
-			</DataRecord>
-		</DataSheet>
-
-		<DataSheet sheetName="" sheetIndex="7" skipWhenNull="TRUE">
-			<DataCell row="1" column="A" dataType="TEXT" fieldName="reportName" />
-			<DataCell row="2" column="C" dataType="TEXT" fieldName="listLotName" />
-			<DataCell row="3" column="C" dataType="TEXT" fieldName="period" />
-			
-			<DataCell row="8" column="AC" dataType="TEXT" fieldName="hoursFormat" />
-
-			<DataRecord listSourceName="tsrTrackingList" beginRow="8" endRow="1000">
-			
-				<BeginRecordCondition column="A" comparator="EQ" checkValue="1" firstRowAsData="TRUE"/>
-			
-				<DataCell row="1" column="B" dataType="TEXT" fieldName="tsrName" autoTrim="TRUE"/>
-				<DataCell row="1" column="C" dataType="NUMBER" fieldName="workday" />
-				<DataCell row="1" column="D" dataType="NUMBER" fieldName="listUsed" />
-				<DataCell row="1" column="E" dataType="NUMBER" fieldName="complete" />
-				
-				<DataCell row="1" column="K" dataType="NUMBER" fieldName="newUsed" />
-				<DataCell row="1" column="T" dataType="NUMBER" fieldName="totalPolicy" />
-				
-				<DataCell row="1" column="AC" dataType="NUMBER" dataFormat="#,##0.00" fieldName="hours" />
-				<DataCell row="1" column="AG" dataType="NUMBER" dataFormat="#,##0.00" fieldName="totalTalkTime" />
-				
 				<EndRecordCondition column="A" comparator="BLANK" checkValue="" />
 			</DataRecord>
 		</DataSheet>

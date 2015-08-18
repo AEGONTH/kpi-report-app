@@ -1,6 +1,7 @@
 package com.adms.batch.kpireport.app;
 
-import com.adms.batch.kpireport.job.ExportJob;
+import com.adms.batch.kpireport.service.ReportExporter;
+import com.adms.batch.kpireport.service.impl.KpiReportExporter;
 import com.adms.utils.DateUtil;
 import com.adms.utils.Logger;
 
@@ -12,15 +13,15 @@ public class ExportKpiReports {
 			String yyyyMM = args[0];
 			String processDate = DateUtil.convDateToString("yyyyMMdd", DateUtil.toEndOfMonth(DateUtil.convStringToDate("yyyyMMdd", yyyyMM + "01")));
 			String outPath = args[1];
-			
 			logger.setLogFileName(args[2]);
 			
-//			String processDate = "20150531";
-//			String outPath = "d:/temp/kpi";
+			logger.info("### Start Export KPI Reports ###");
+			ReportExporter export = new KpiReportExporter();
+			export.exportExcel(outPath, processDate);
 			
-			ExportJob.getInstance(processDate).exportKpiReports(outPath);
 		} catch(Exception e) {
 			logger.error(e.getMessage(), e);
 		}
+		logger.info("### Finish Export KPI Reports ###");
 	}
 }
