@@ -72,7 +72,7 @@ public class KpiReportExporter implements ReportExporter {
 		
 		String yyyyMM = processDate.substring(0, 6);
 		String msigListLots = "";
-		outPath = destination + "/" + yyyyMM;
+		outPath = destination + File.separatorChar + yyyyMM;
 		
 		try {
 			msigListLots = FixMsigListLot.getInstance().getFixMisgListLotDelim(processDate);
