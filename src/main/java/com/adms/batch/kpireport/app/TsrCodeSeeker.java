@@ -48,7 +48,12 @@ public class TsrCodeSeeker {
 				updatedTotal = app.updateProcess(tsrTrackingList, tsrCodeMap);
 				log.info("total " + updatedTotal + " updated");
 				log.info("re-checking the name that still no code...");
-				app.distinctTsrName(app.findTsrCodeIsNull());
+				tsrTrackingList = app.findTsrCodeIsNull();
+				if(!tsrTrackingList.isEmpty()) {
+					log.info("TSR Code null still exist, total record: " + tsrTrackingList.size() + " records");
+				} else {
+					log.info("OK!!");
+				}
 			}
 			log.info("############################### Finished ##################################");
 			log.info("###########################################################################");
@@ -75,7 +80,7 @@ public class TsrCodeSeeker {
 					tsrNames.add(tt.getTsrName());
 				}
 			}
-			log.info("######## Total TSR Name: " + tsrNames.size());
+			log.info("######## Total TSR Name: " + tsrNames.size() + " names");
 		}
 		return tsrNames;
 	}
