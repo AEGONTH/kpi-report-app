@@ -59,9 +59,9 @@ public class TsrCodeSeeker {
 			log.info("###########################################################################");
 			
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			log.error("Error: File not Found", e);
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.getMessage());
 		}
 	}
 	

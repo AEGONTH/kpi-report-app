@@ -72,8 +72,7 @@ public class TsrTrackingImporter implements DataImporter {
 			}
 			
 		} catch(Exception e) {
-//			logger.error(e.getMessage(), e);
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 		} finally {
 			try { fileformatStream.close(); } catch(Exception e) {}
 			try { wbStream.close(); } catch(Exception e) {}
