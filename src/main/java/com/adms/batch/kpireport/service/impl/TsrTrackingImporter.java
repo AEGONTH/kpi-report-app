@@ -124,8 +124,12 @@ public class TsrTrackingImporter implements DataImporter {
 	
 	private void logic(DataHolder sheetHolder, String sheetName, boolean isNewTimeFormat) {
 		try {
+			if(sheetHolder.get("period") == null || (sheetHolder.get("period") != null && sheetHolder.get("period").getStringValue().isEmpty())) {
+				logger.error("SKIP Sheet: " + sheetName + ", due to cannot get period value");
+				return;
+			}
 			String period = sheetHolder.get("period").getStringValue().trim().substring(0, 10);
-			String listLotName = sheetHolder.get("listLotName").getStringValue();
+			String listLotName = sheetHolder.get("listLotName") == null ? null : sheetHolder.get("listLotName").getStringValue();
 			List<DataHolder> datas = sheetHolder.getDataList("tsrTrackingList");
 			String hoursFormat = sheetHolder.get("hoursFormat").getStringValue();
 			
@@ -133,6 +137,9 @@ public class TsrTrackingImporter implements DataImporter {
 			NewTimeFormatHelper.getInstance().setThisFileIsNewTimeFormat(hoursFormat.contains("hh.mm"));
 			
 //			<!-- getting Listlot -->
+			if(listLotName == null) {
+				throw new Exception("Cannot get ListLotname on sheet: " + sheetName);
+			}
 			if(listLotName.contains(",")) { logger.info("SKIP>> sheetName:" + sheetName + " | listLotName: " + listLotName + " | period: " + period); return;}
 			logger.info("## Do sheet: " + sheetName + " | listLotName: " + listLotName + " | period: " + period); 
 			
@@ -239,7 +246,7 @@ public class TsrTrackingImporter implements DataImporter {
 				tsrTracking.setTsr(tsr);
 				isUpdate = true;
 			}
-			if(!tsrTracking.getListUsed().equals(listUsed)) {
+			if(tsrTracking.getListUsed() == null ? !(new Integer(0)).equals(listUsed) : !tsrTracking.getListUsed().equals(listUsed)) {
 				tsrTracking.setListUsed(listUsed);
 				isUpdate = true;
 			}
