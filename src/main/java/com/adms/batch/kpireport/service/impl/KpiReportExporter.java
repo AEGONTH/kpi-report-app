@@ -27,6 +27,7 @@ import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.type.StringType;
 
 import com.adms.batch.kpireport.service.ReportExporter;
 import com.adms.batch.kpireport.util.AppConfig;
@@ -65,6 +66,12 @@ public class KpiReportExporter implements ReportExporter {
 	
 	private Map<String, Double[]> tsrABGradeByDsmMap = new HashMap<>();
 	
+	private Map<String, Tsr> tsrDataMap;
+	private Map<String, Tsr> newTsrOnFloor;
+	
+	private List<Date> globalWorkingDates;
+	private Integer globalWorkingDayOnMonth;
+	
 	private String outPath = "";
 	
 	@Override
@@ -77,7 +84,10 @@ public class KpiReportExporter implements ReportExporter {
 		try {
 			msigListLots = FixMsigListLot.getInstance().getFixMisgListLotDelim(processDate);
 			logger.info("MSIG WB List Lots >> " + msigListLots);
-
+			
+			logger.info("Retrieving All Tsr to MAP...");
+			createMapForTsr();
+			
 			logicExport(yyyyMM, msigListLots);
 			
 		} catch(Exception e) {
@@ -200,23 +210,16 @@ public class KpiReportExporter implements ReportExporter {
 		int numOfTemplates = 0;
 		
 		try {
-			int totalWorkDays = getWorkDays(yearMonth);
-			logger.info("# Total Working day: " + totalWorkDays);
-			
 			retentionForSup = new HashMap<>();
 			for(KpiRetention kpiRetention : kpiRetentions) {
 				sumRetention(retentionForSup, kpiRetention.getSupCode()
 						, kpiRetention.getBeginMonth().doubleValue()
 						, kpiRetention.getDuringMonth().doubleValue()
 						, kpiRetention.getEndMonth().doubleValue());
-//				if(retentionForSup.get(kpiRetention.getSupCode()) == null) {
-//					retentionForSup.put(kpiRetention.getSupCode(), new Double[]{0D, 0D, 0D});
-//				}
-//				Double[] retentions = retentionForSup.get(kpiRetention.getSupCode());
-//				retentions[0] += kpiRetention.getBeginMonth();
-//				retentions[1] += kpiRetention.getDuringMonth();
-//				retentions[2] += kpiRetention.getEndMonth();
 			}
+			
+			this.globalWorkingDayOnMonth = getWorkDays(yearMonth);
+			logger.info("Global Working Day on Month: " + globalWorkingDayOnMonth);
 			
 			for(String campaignCode : mapCampaignDsm.keySet()) {
 				
@@ -251,7 +254,7 @@ public class KpiReportExporter implements ReportExporter {
 						for(String tsrCode : mapCampaignDsm.get(campaignCode).get(dsmCode).get(supCode)) {
 //							<!-- TSR Section -->
 							Object[] tsrObjects = getTsrKpiByCampaign(yearMonth, campaignCode, dsmCode, supCode, tsrCode);
-							logicTsrSectionByCampaign(tempSheet, sheet, yearMonth, tsrObjects, totalWorkDays);
+							logicTsrSectionByCampaign(tempSheet, sheet, yearMonth, tsrObjects);
 						}
 					}
 				}
@@ -351,7 +354,7 @@ public class KpiReportExporter implements ReportExporter {
 		Integer firstConfirmSale = Integer.valueOf(String.valueOf(objects[2]));
 		Integer allSale = Integer.valueOf(String.valueOf(objects[3]));
 	
-		String fullName = tsrService.find(new Tsr(dsmCode)).get(0).getFullName();
+		String fullName = tsrDataMap.get(dsmCode).getFullName();
 		
 		boolean skip = false;
 		
@@ -490,7 +493,7 @@ public class KpiReportExporter implements ReportExporter {
 	}
 	
 	private void logicSupGradeSummary(Sheet tempSheet, Sheet sheet, String supCode, List<String[]> vals) throws Exception {
-			String fullName = tsrService.find(new Tsr(supCode)).get(0).getFullName();
+			String fullName = tsrDataMap.get(supCode).getFullName();
 			int valSize = vals.size();
 			int tempRow = 1;
 			Double sumScore = 0D;
@@ -541,7 +544,6 @@ public class KpiReportExporter implements ReportExporter {
 					}
 					if(tempRow < 4) tempRow++;
 				}
-	
 			}
 			
 	//		<!-- Summary Row -->
@@ -553,195 +555,193 @@ public class KpiReportExporter implements ReportExporter {
 		}
 
 	private void logicSupSectionByCampaign(Sheet tempSheet, Sheet sheet, String yearMonth, Object[] objs, Map<String, Double[]> retentionForSup) throws Exception {
-			/*
-			 * object index 
-			 * [0] = campaignCode
-			 * [1] = listLotCode
-			 * [2] = dsmCode
-			 * [3] = supCode
-			 * [4] = totalAfyp
-			 * [5] = countTsr
-			 * [6] = firstConfirmSale
-			 * [7] = allSale
-			 * [8] = successPolicy
-			 * [9] = totalUsed
-			 */
-			String campaignCode = String.valueOf(objs[0]);
-			String listLotCode = objs[1] == null ? null : String.valueOf(objs[1]);
-	//		String dsmCode = String.valueOf(objs[2]);
-			String supCode = String.valueOf(objs[3]);
-			BigDecimal totalAfyp = new BigDecimal(String.valueOf(objs[4]));
-			Integer countTsr = Integer.valueOf(String.valueOf(objs[5]));
-			Integer firstConfirmSale = Integer.valueOf(String.valueOf(objs[6]));
-			Integer allSale = Integer.valueOf(String.valueOf(objs[7]));
-			Integer successPolicy = Integer.valueOf(String.valueOf(objs[8]));
-			Integer totalUsed = Integer.valueOf(String.valueOf(objs[9]));
-			
-			boolean skip = false;
-			
-			String fullName = tsrService.find(new Tsr(supCode)).get(0).getFullName();
-			
-	//		<!-- get end of month -->
-			Calendar end = DateUtil.getCurrentCalendar();
-			end.setTime(DateUtil.convStringToDate("yyyyMMdd", yearMonth + "01"));
-			DateUtil.addMonth(end, 1);
-			DateUtil.addDay(end, -1);
-			
-			List<KpiCategorySetup> kpiCategories = getKpiCategory(supCode, "SUP", campaignCode, listLotCode, DateUtil.convStringToDate("yyyyMMdd", yearMonth + "01"), end.getTime());
-			if(kpiCategories.isEmpty()) {
-				logger.warn("No KPI Category for this SUP: " + supCode + " | campaignCode: " + campaignCode + " | listLotCode: " + listLotCode + " effectiveDate: " + DateUtil.convStringToDate("yyyyMMdd", yearMonth + "01") + " | endDate: " + end.getTime());
-				skip = true;
-			}
-			
-			
-	//		<!-- Sup template start on 2nd row and end on 7th row -->
-			for(int rt = 1; rt < 7; rt++) {
-				int currentRow = sheet.getLastRowNum() + 1;
-				Row row = sheet.createRow(currentRow);
-				
-				for(int c = getColumnIndex("A"); c <= getColumnIndex("G"); c++) {
-					boolean copyData = false;
-					if((c == getColumnIndex("A") && rt != 2) || c == getColumnIndex("B")) copyData = true;
-					copyRowCellDataWithSameColumn(tempSheet, sheet, rt, currentRow, c, c, copyData);
-					
-					if(!copyData && !skip) {
-						Cell cell = row.getCell(c, Row.CREATE_NULL_AS_BLANK);
-						/*
-						 * switch Column
-						 * case 0 = Position
-						 * case 1 = KPIs
-						 * case 2 = Weight
-						 * case 3 = Target
-						 * case 4 = Actual
-						 * case 5 = %vs. Target
-						 * case 6 = Score
-						 */
-						if(rt == 1) {
-							String formula = "";
-							switch(c) {
-							case 2 : 
-								cell.setCellValue(kpiCategories.get(0).getWeight().doubleValue()); 
-								cell.getSheet().addMergedRegion(new CellRangeAddress(cell.getRowIndex(), cell.getRowIndex() + 1, cell.getColumnIndex(), cell.getColumnIndex()));
-								break;
-							case 3 : cell.setCellValue(kpiCategories.get(0).getTarget().doubleValue()); break;
-							case 4 : cell.setCellValue(totalAfyp.doubleValue() / countTsr.doubleValue()); break;
-							case 6 :
-								formula = "IF(F#ROW > 1, C#ROW, F#ROW * C#ROW)";
-								cell.setCellFormula(formula.replaceAll("#ROW", String.valueOf((currentRow+1))));
-								break;
-							default : break;
-							}
-						} else if(rt == 2) {
-							String formula = "";
-							switch(c) {
-							case 0 : cell.setCellValue(fullName); break;
-							case 3 : cell.setCellValue(kpiCategories.get(1).getTarget().doubleValue()); break;
-							case 4 : cell.setCellValue(totalAfyp.doubleValue()); break;
-							case 5 : 
-								formula = "(E" + (cell.getRowIndex()) + "/" + "D" + (cell.getRowIndex()) + ")*(E" + (cell.getRowIndex() + 1) + "/D" + (cell.getRowIndex() + 1) + ")";
-								cell.getSheet().addMergedRegion(new CellRangeAddress(cell.getRowIndex() - 1, cell.getRowIndex(), cell.getColumnIndex(), cell.getColumnIndex()));
-								Cell mergedCell = sheet.getRow(cell.getRowIndex() - 1).getCell(c, Row.CREATE_NULL_AS_BLANK);
-								mergedCell.setCellFormula(formula);
-								break;
-							case 6 : 
-								cell.getSheet().addMergedRegion(new CellRangeAddress(cell.getRowIndex() - 1, cell.getRowIndex(), cell.getColumnIndex(), cell.getColumnIndex()));
-								break;
-							default : break;
-							}
-						} else if(rt == 3) {
-							String formula = "";
-							switch(c) {
-							case 2 : cell.setCellValue(kpiCategories.get(2).getWeight().doubleValue()); break;
-							case 3 : cell.setCellValue(kpiCategories.get(2).getTarget().doubleValue()); break;
-							case 4 : cell.setCellValue(totalUsed.doubleValue() == 0d ? 0D : successPolicy.doubleValue() / totalUsed.doubleValue()); break;
-							case 5 : 
-								formula = "IF(D#ROW > 0, E#ROW / D#ROW, 0)";
-								cell.setCellFormula(formula.replaceAll("#ROW", String.valueOf((currentRow+1))));
-								break;
-							case 6 : 
-								formula = "IF(F#ROW > 1, C#ROW, F#ROW * C#ROW)";
-								cell.setCellFormula(formula.replaceAll("#ROW", String.valueOf((currentRow+1))));
-								break;
-							default : break;
-							}
-						} else if(rt == 4) {
-							String formula = "";
-							switch(c) {
-							case 2 : cell.setCellValue(kpiCategories.get(3).getWeight().doubleValue()); break;
-							case 3 : cell.setCellValue(kpiCategories.get(3).getTarget().doubleValue()); break;
-							case 4 : cell.setCellValue(firstConfirmSale.doubleValue() / allSale.doubleValue()); break;
-							case 5 : 
-								formula = "IF(D#ROW > 0, E#ROW / D#ROW, 0)";
-								cell.setCellFormula(formula.replaceAll("#ROW", String.valueOf((currentRow+1))));
-								break;
-							case 6 : 
-								formula = "IF(F#ROW > 1, C#ROW, F#ROW * C#ROW)";
-								cell.setCellFormula(formula.replaceAll("#ROW", String.valueOf((currentRow+1))));
-								break;
-							default : break;
-							}
-						} else if(rt == 5) {
-							String formula = "";
-							switch(c) {
-							case 2 : cell.setCellValue(kpiCategories.get(4).getWeight().doubleValue()); break;
-							case 3 : cell.setCellValue(kpiCategories.get(4).getTarget().doubleValue()); break;
-							case 4 : 
-								Double[] retention = retentionForSup.get(supCode);
-								Double base = retention[0].doubleValue() + retention[1].doubleValue();
-								cell.setCellValue(base.compareTo(new Double(0d)) <= 0 ? 0d : retention[2].doubleValue() / base.doubleValue());
-								break;
-							case 5 : 
-								formula = "IF(D#ROW > 0, E#ROW / D#ROW, 0)";
-								cell.setCellFormula(formula.replaceAll("#ROW", String.valueOf((currentRow+1))));
-								break;
-							case 6 : 
-								formula = "IF(F#ROW > 1, C#ROW, F#ROW * C#ROW)";
-								cell.setCellFormula(formula.replaceAll("#ROW", String.valueOf((currentRow+1))));
-								break;
-							default : break;
-							}
-						} else if(rt == 6) {
-							String sumFormula = "";
-							switch(c) {
-							case 2 : 
-								sumFormula = "SUM(C" + (cell.getRowIndex() - 4) + ":C" + (cell.getRowIndex()) + ")";
-								cell.setCellFormula(sumFormula);
-								break;
-							case 6 : 
-								sumFormula = "SUM(G" + (cell.getRowIndex() - 4) + ":G" + (cell.getRowIndex()) + ")";
-								cell.setCellFormula(sumFormula); 
-								break;
-							default : break;
-							}
-						}
-					} 
-					
-				}
-				
-	//			<!-- set SUP name -->
-				if(skip && rt == 2) {
-					row.getCell(0, Row.CREATE_NULL_AS_BLANK).setCellValue(fullName);
-				}
-				
-			}
-			
-	//		<!-- Calculate Grade for SUP -->
-			Cell sumScoreCell = sheet.getRow(sheet.getLastRowNum()).getCell(getColumnIndex("G"), Row.CREATE_NULL_AS_BLANK);
-			Cell gradeCell = sheet.getRow(sheet.getLastRowNum() - 5).createCell(getColumnIndex("H"), Cell.CELL_TYPE_STRING);
-			FormulaEvaluator evaluator = sheet.getWorkbook().getCreationHelper().createFormulaEvaluator();
-			Double score = skip ? null : evaluator.evaluate(sumScoreCell).getNumberValue();
-			gradeCell.setCellValue(getGrade(score));
-			
-	//		<!-- Keep score of sup in map. For Sup grade summary -->
-			if(!skip) {
-				if(supGradeMap.get(supCode) == null) {
-					supGradeMap.put(supCode, new ArrayList<String[]>());
-				}
-				supGradeMap.get(supCode).add(new String[]{campaignCode.concat(StringUtils.isNoneBlank(listLotCode) ? ("_" + listLotCode) : ""), score.toString()});
-			}
+		/*
+		 * object index 
+		 * [0] = campaignCode
+		 * [1] = listLotCode
+		 * [2] = dsmCode
+		 * [3] = supCode
+		 * [4] = totalAfyp
+		 * [5] = countTsr
+		 * [6] = firstConfirmSale
+		 * [7] = allSale
+		 * [8] = successPolicy
+		 * [9] = totalUsed
+		 */
+		String campaignCode = String.valueOf(objs[0]);
+		String listLotCode = objs[1] == null ? null : String.valueOf(objs[1]);
+//		String dsmCode = String.valueOf(objs[2]);
+		String supCode = String.valueOf(objs[3]);
+		BigDecimal totalAfyp = new BigDecimal(String.valueOf(objs[4]));
+		Integer countTsr = Integer.valueOf(String.valueOf(objs[5]));
+		Integer firstConfirmSale = Integer.valueOf(String.valueOf(objs[6]));
+		Integer allSale = Integer.valueOf(String.valueOf(objs[7]));
+		Integer successPolicy = Integer.valueOf(String.valueOf(objs[8]));
+		Integer totalUsed = Integer.valueOf(String.valueOf(objs[9]));
+		
+		boolean skip = false;
+		
+		String fullName = tsrDataMap.get(supCode).getFullName();
+		
+//		<!-- get end of month -->
+		Calendar end = DateUtil.getCurrentCalendar();
+		end.setTime(DateUtil.convStringToDate("yyyyMMdd", yearMonth + "01"));
+		DateUtil.addMonth(end, 1);
+		DateUtil.addDay(end, -1);
+		
+		List<KpiCategorySetup> kpiCategories = getKpiCategory(supCode, "SUP", campaignCode, listLotCode, DateUtil.convStringToDate("yyyyMMdd", yearMonth + "01"), end.getTime());
+		if(kpiCategories.isEmpty()) {
+			logger.warn("No KPI Category for this SUP: " + supCode + " | campaignCode: " + campaignCode + " | listLotCode: " + listLotCode + " effectiveDate: " + DateUtil.convStringToDate("yyyyMMdd", yearMonth + "01") + " | endDate: " + end.getTime());
+			skip = true;
 		}
+		
+//		<!-- Sup template start on 2nd row and end on 7th row -->
+		for(int rt = 1; rt < 7; rt++) {
+			int currentRow = sheet.getLastRowNum() + 1;
+			Row row = sheet.createRow(currentRow);
+			
+			for(int c = getColumnIndex("A"); c <= getColumnIndex("G"); c++) {
+				boolean copyData = false;
+				if((c == getColumnIndex("A") && rt != 2) || c == getColumnIndex("B")) copyData = true;
+				copyRowCellDataWithSameColumn(tempSheet, sheet, rt, currentRow, c, c, copyData);
+				
+				if(!copyData && !skip) {
+					Cell cell = row.getCell(c, Row.CREATE_NULL_AS_BLANK);
+					/*
+					 * switch Column
+					 * case 0 = Position
+					 * case 1 = KPIs
+					 * case 2 = Weight
+					 * case 3 = Target
+					 * case 4 = Actual
+					 * case 5 = %vs. Target
+					 * case 6 = Score
+					 */
+					if(rt == 1) {
+						String formula = "";
+						switch(c) {
+						case 2 : 
+							cell.setCellValue(kpiCategories.get(0).getWeight().doubleValue()); 
+							cell.getSheet().addMergedRegion(new CellRangeAddress(cell.getRowIndex(), cell.getRowIndex() + 1, cell.getColumnIndex(), cell.getColumnIndex()));
+							break;
+						case 3 : cell.setCellValue(kpiCategories.get(0).getTarget().doubleValue()); break;
+						case 4 : cell.setCellValue(totalAfyp.doubleValue() / countTsr.doubleValue()); break;
+						case 6 :
+							formula = "IF(F#ROW > 1, C#ROW, F#ROW * C#ROW)";
+							cell.setCellFormula(formula.replaceAll("#ROW", String.valueOf((currentRow+1))));
+							break;
+						default : break;
+						}
+					} else if(rt == 2) {
+						String formula = "";
+						switch(c) {
+						case 0 : cell.setCellValue(fullName); break;
+						case 3 : cell.setCellValue(kpiCategories.get(1).getTarget().doubleValue()); break;
+						case 4 : cell.setCellValue(totalAfyp.doubleValue()); break;
+						case 5 : 
+							formula = "(E" + (cell.getRowIndex()) + "/" + "D" + (cell.getRowIndex()) + ")*(E" + (cell.getRowIndex() + 1) + "/D" + (cell.getRowIndex() + 1) + ")";
+							cell.getSheet().addMergedRegion(new CellRangeAddress(cell.getRowIndex() - 1, cell.getRowIndex(), cell.getColumnIndex(), cell.getColumnIndex()));
+							Cell mergedCell = sheet.getRow(cell.getRowIndex() - 1).getCell(c, Row.CREATE_NULL_AS_BLANK);
+							mergedCell.setCellFormula(formula);
+							break;
+						case 6 : 
+							cell.getSheet().addMergedRegion(new CellRangeAddress(cell.getRowIndex() - 1, cell.getRowIndex(), cell.getColumnIndex(), cell.getColumnIndex()));
+							break;
+						default : break;
+						}
+					} else if(rt == 3) {
+						String formula = "";
+						switch(c) {
+						case 2 : cell.setCellValue(kpiCategories.get(2).getWeight().doubleValue()); break;
+						case 3 : cell.setCellValue(kpiCategories.get(2).getTarget().doubleValue()); break;
+						case 4 : cell.setCellValue(totalUsed.doubleValue() == 0d ? 0D : successPolicy.doubleValue() / totalUsed.doubleValue()); break;
+						case 5 : 
+							formula = "IF(D#ROW > 0, E#ROW / D#ROW, 0)";
+							cell.setCellFormula(formula.replaceAll("#ROW", String.valueOf((currentRow+1))));
+							break;
+						case 6 : 
+							formula = "IF(F#ROW > 1, C#ROW, F#ROW * C#ROW)";
+							cell.setCellFormula(formula.replaceAll("#ROW", String.valueOf((currentRow+1))));
+							break;
+						default : break;
+						}
+					} else if(rt == 4) {
+						String formula = "";
+						switch(c) {
+						case 2 : cell.setCellValue(kpiCategories.get(3).getWeight().doubleValue()); break;
+						case 3 : cell.setCellValue(kpiCategories.get(3).getTarget().doubleValue()); break;
+						case 4 : cell.setCellValue(firstConfirmSale.doubleValue() / allSale.doubleValue()); break;
+						case 5 : 
+							formula = "IF(D#ROW > 0, E#ROW / D#ROW, 0)";
+							cell.setCellFormula(formula.replaceAll("#ROW", String.valueOf((currentRow+1))));
+							break;
+						case 6 : 
+							formula = "IF(F#ROW > 1, C#ROW, F#ROW * C#ROW)";
+							cell.setCellFormula(formula.replaceAll("#ROW", String.valueOf((currentRow+1))));
+							break;
+						default : break;
+						}
+					} else if(rt == 5) {
+						String formula = "";
+						switch(c) {
+						case 2 : cell.setCellValue(kpiCategories.get(4).getWeight().doubleValue()); break;
+						case 3 : cell.setCellValue(kpiCategories.get(4).getTarget().doubleValue()); break;
+						case 4 : 
+							Double[] retention = retentionForSup.get(supCode);
+							Double base = retention[0].doubleValue() + retention[1].doubleValue();
+							cell.setCellValue(base.compareTo(new Double(0d)) <= 0 ? 0d : retention[2].doubleValue() / base.doubleValue());
+							break;
+						case 5 : 
+							formula = "IF(D#ROW > 0, E#ROW / D#ROW, 0)";
+							cell.setCellFormula(formula.replaceAll("#ROW", String.valueOf((currentRow+1))));
+							break;
+						case 6 : 
+							formula = "IF(F#ROW > 1, C#ROW, F#ROW * C#ROW)";
+							cell.setCellFormula(formula.replaceAll("#ROW", String.valueOf((currentRow+1))));
+							break;
+						default : break;
+						}
+					} else if(rt == 6) {
+						String sumFormula = "";
+						switch(c) {
+						case 2 : 
+							sumFormula = "SUM(C" + (cell.getRowIndex() - 4) + ":C" + (cell.getRowIndex()) + ")";
+							cell.setCellFormula(sumFormula);
+							break;
+						case 6 : 
+							sumFormula = "SUM(G" + (cell.getRowIndex() - 4) + ":G" + (cell.getRowIndex()) + ")";
+							cell.setCellFormula(sumFormula); 
+							break;
+						default : break;
+						}
+					}
+				} 
+			}
+			
+//			<!-- set SUP name -->
+			if(skip && rt == 2) {
+				row.getCell(0, Row.CREATE_NULL_AS_BLANK).setCellValue(fullName);
+			}
+			
+		}
+		
+//		<!-- Calculate Grade for SUP -->
+		Cell sumScoreCell = sheet.getRow(sheet.getLastRowNum()).getCell(getColumnIndex("G"), Row.CREATE_NULL_AS_BLANK);
+		Cell gradeCell = sheet.getRow(sheet.getLastRowNum() - 5).createCell(getColumnIndex("H"), Cell.CELL_TYPE_STRING);
+		FormulaEvaluator evaluator = sheet.getWorkbook().getCreationHelper().createFormulaEvaluator();
+		Double score = skip ? null : evaluator.evaluate(sumScoreCell).getNumberValue();
+		gradeCell.setCellValue(getGrade(score));
+		
+//		<!-- Keep score of sup in map. For Sup grade summary -->
+		if(!skip) {
+			if(supGradeMap.get(supCode) == null) {
+				supGradeMap.put(supCode, new ArrayList<String[]>());
+			}
+			supGradeMap.get(supCode).add(new String[]{campaignCode.concat(StringUtils.isNoneBlank(listLotCode) ? ("_" + listLotCode) : ""), score.toString()});
+		}
+	}
 
-	private void logicTsrSectionByCampaign(Sheet tempSheet, Sheet sheet, String yearMonth, Object[] objs, Integer totalWorkDays) throws Exception {
+	private void logicTsrSectionByCampaign(Sheet tempSheet, Sheet sheet, String yearMonth, Object[] objs) throws Exception {
 		/*
 		 * object index
 		 * [0] = campaignCode
@@ -768,7 +768,15 @@ public class KpiReportExporter implements ReportExporter {
 		
 		boolean skip = false;
 		
-		String fullName = tsrService.find(new Tsr(tsrCode)).get(0).getFullName();
+		String fullName = tsrDataMap.get(tsrCode).getFullName();
+		Integer totalWorkDays = null;
+		
+		if(isNewTsrOnFloor(yearMonth, tsrCode)) {
+			totalWorkDays = getWorkDays(yearMonth, tsrCode);
+			logger.info("# Total Working day for TSR: " + tsrCode + " -> " + totalWorkDays);
+		} else {
+			totalWorkDays = new Integer(globalWorkingDayOnMonth);
+		}
 		
 //		<!-- get end of month -->
 		Calendar end = DateUtil.getCurrentCalendar();
@@ -1151,53 +1159,90 @@ public class KpiReportExporter implements ReportExporter {
 	}
 	
 	private Integer getWorkDays(String yyyyMM) throws Exception {
-		Integer days = 365;
-		Date begin = DateUtil.convStringToDate("yyyyMMdd", yyyyMM + "01");
-		Date end = null;
+		return getWorkingDaysBySaleDate(yyyyMM).size();
+	}
+	
+	private Integer getWorkDays(String yyyyMM, String tsrCode) throws Exception {
+		Integer workdays = new Integer(0);
+		Tsr tsr = tsrDataMap.get(tsrCode);
+		List<Date> allWorkDate = getWorkingDaysBySaleDate(yyyyMM);
+		allWorkDate.sort((d1, d2) -> d1.compareTo(d2));
 		
-		Calendar cal = DateUtil.getCurrentCalendar();
-		cal.setTime(begin);
-		DateUtil.addMonth(cal, 1);
-		DateUtil.addDay(cal, -1);
-		end = DateUtil.convStringToDate("yyyyMMdd", DateUtil.convDateToString("yyyyMMdd", cal.getTime()));
-		
-		DetachedCriteria criteria = DetachedCriteria.forClass(Sales.class);
-		criteria.add(Restrictions.between("saleDate", begin, end));
-		criteria.setProjection(Projections.distinct(Projections.property("saleDate")));
-		
-		SalesService service = (SalesService) AppConfig.getInstance().getBean("salesService");
-		List<?> list = service.findByCriteria(criteria);
-		Object[] objs = list.toArray();
-		for(Object obj : objs) {
-			java.sql.Date date = (java.sql.Date) obj;
-			if(isSaturdayOrSunDay(new Date(date.getTime()))) {
-				list.remove(obj);
+		for(Date date : allWorkDate) {
+			if(date.compareTo(tsr.getFloorDate()) >= 0) {
+				workdays++;
 			}
 		}
-		
-		days = list.size();
-		return days;
+		return workdays;
+	}
+	
+	private boolean isNewTsrOnFloor(String yyyyMM, String tsrCode) throws Exception {
+		if(newTsrOnFloor == null) {
+			newTsrOnFloor = new HashMap<>();
+			
+			DetachedCriteria criteria = DetachedCriteria.forClass(Tsr.class);
+			criteria.add(Restrictions.isNotNull("floorDate"));
+			criteria.add(Restrictions.sqlRestriction("CONVERT(nvarchar(6), FLOOR_DATE, 112) = ?", yyyyMM, StringType.INSTANCE));
+			List<Tsr> list = tsrService.findByCriteria(criteria);
+			for(Tsr t : list) newTsrOnFloor.put(t.getTsrCode(), t);
+		}
+		return newTsrOnFloor.get(tsrCode) != null;
+	}
+	
+	private List<Date> getWorkingDaysBySaleDate(String yyyyMM) throws Exception {
+		if(globalWorkingDates == null) {
+			Date begin = DateUtil.convStringToDate("yyyyMMdd", yyyyMM + "01");
+			Date end = null;
+			
+			Calendar cal = DateUtil.getCurrentCalendar();
+			cal.setTime(begin);
+			DateUtil.addMonth(cal, 1);
+			DateUtil.addDay(cal, -1);
+			end = DateUtil.convStringToDate("yyyyMMdd", DateUtil.convDateToString("yyyyMMdd", cal.getTime()));
+			
+			DetachedCriteria criteria = DetachedCriteria.forClass(Sales.class);
+			criteria.add(Restrictions.between("saleDate", begin, end));
+			criteria.add(Restrictions.sqlRestriction("DATENAME(DW, SALE_DATE) not in ('Saturday', 'Sunday')"));
+			criteria.setProjection(Projections.distinct(Projections.property("saleDate")));
+			
+			SalesService service = (SalesService) AppConfig.getInstance().getBean("salesService");
+			List<?> list = service.findByCriteria(criteria);
+			globalWorkingDates = new ArrayList<>();
+			for(Object obj : list.toArray()) {
+				globalWorkingDates.add((Date) obj);
+			}
+		}
+		return globalWorkingDates;
+	}
+	
+	private void createMapForTsr() {
+		try {
+			tsrDataMap = new HashMap<>();
+			for(Tsr tsr : tsrService.findAll()) {
+				tsrDataMap.put(tsr.getTsrCode(), tsr);
+			}
+		} catch(Exception e) {
+			logger.error(e);
+		}
 	}
 	
 	private int getColumnIndex(String columnString) {
 		return CellReference.convertColStringToIndex(columnString);
 	}
-
-	
 	
 	private boolean isMsigWB(String listLotDelim, String listLotCode) {
 		return StringUtils.isNoneBlank(listLotCode) && listLotDelim.contains(listLotCode) ? true : false;
 	}
 
-	private boolean isSaturdayOrSunDay(Date date) {
-		Calendar cal = DateUtil.getCurrentCalendar();
-		cal.setTime(date);
-		int day = cal.get(Calendar.DAY_OF_WEEK);
-		if(day == Calendar.SATURDAY || day == Calendar.SUNDAY) {
-			return true;
-		}
-		return false;
-	}
+//	private boolean isSaturdayOrSunDay(Date date) {
+//		Calendar cal = DateUtil.getCurrentCalendar();
+//		cal.setTime(date);
+//		int day = cal.get(Calendar.DAY_OF_WEEK);
+//		if(day == Calendar.SATURDAY || day == Calendar.SUNDAY) {
+//			return true;
+//		}
+//		return false;
+//	}
 	
 	private void writeout(Workbook wb, String outPath, String fileName, int numOfTemplates) {
 			OutputStream os = null;

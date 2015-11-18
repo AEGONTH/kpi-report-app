@@ -2,7 +2,17 @@
 <FileFormat fileName="" fileType="xls" locale="US">
 	<DataSet description="kpiTargetSetupFormat">
 	
-		<DataSheet sheetName="" sheetIndex="0">
+	    <DataSheet sheetName="" sheetIndex="0">
+			<DataRecord listSourceName="newTsrList" beginRow="8" endRow="9999">
+				<DataCell row="1" column="C" dataType="TEXT" fieldName="tsrCode" />
+				<DataCell row="1" column="D" dataType="TEXT" fieldName="tsrName" />
+				<DataCell row="1" column="E" dataType="DATE" dataFormat="dd/MM/yyyy" fieldName="floorDate" />
+				
+				<EndRecordCondition column="C" comparator="BLANK" checkValue="" />
+			</DataRecord>
+		</DataSheet>
+	    
+		<DataSheet sheetName="" sheetIndex="1">
 		
 			<DataCell row="9" column="E" dataType="DATE" dataFormat="dd-MM-yyyy" fieldName="effectiveDate" />
 			<DataCell row="9" column="G" dataType="DATE" dataFormat="dd-MM-yyyy" fieldName="endDate" />
@@ -48,7 +58,7 @@
 			</DataRecord>
 		</DataSheet>
 	
-		<DataSheet sheetName="" sheetIndexs="1-30" skipWhenNull="TRUE">
+		<DataSheet sheetName="" sheetIndexs="2-30" skipWhenNull="TRUE">
 		
 			<DataCell row="6" column="E" dataType="TEXT" fieldName="campaignName" />
 			<DataCell row="7" column="E" dataType="TEXT" fieldName="campaignCode" />

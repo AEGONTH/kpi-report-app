@@ -5,8 +5,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 
 import com.adms.batch.kpireport.enums.EFileFormat;
 import com.adms.batch.kpireport.service.DataImporter;
@@ -28,6 +32,7 @@ public class KpiTargetSetupImporter implements DataImporter {
 	private final String DSM = "DSM";
 	private final String SUP = "SUP";
 	private final String TSR = "TSR";
+	private final String NEW_TSR = "NEW TSR";
 	
 	private final String USER_LOGIN = "KPI Target Importer";
 
@@ -62,7 +67,11 @@ public class KpiTargetSetupImporter implements DataImporter {
 					logger.info("Sheet name: " + sheetName);
 					DataHolder sheet = wb.get(sheetName);
 					
-					logicKpiSetup(sheetName.equalsIgnoreCase(DSM) ? DSM : SUP, sheet);
+					if(sheetName.equalsIgnoreCase(NEW_TSR)) {
+						logicImportNewTSRFloorDate(sheet);
+					} else {
+						logicKpiSetup(sheetName.equalsIgnoreCase(DSM) ? DSM : SUP, sheet);
+					}
 					
 				} catch(Exception e) {
 					logger.error(e.getMessage(), e);
@@ -76,7 +85,6 @@ public class KpiTargetSetupImporter implements DataImporter {
 			try {fileFormatStream.close();} catch (IOException e) {}
 			logger.info("########## Finish ##########");
 		}
-		
 	}
 	
 	private void clearDataByDate(String processDate) throws Exception {
@@ -174,4 +182,28 @@ public class KpiTargetSetupImporter implements DataImporter {
 		if(level.equalsIgnoreCase(SUP)) logicKpiSetup(TSR, sheet);
 	}
 
+	private void logicImportNewTSRFloorDate(DataHolder sheetHolder) throws Exception {
+		logger.info("### Update New Tsr on Floor Date ###");
+		List<DataHolder> dataList = sheetHolder.getDataList("newTsrList");
+		if(dataList == null) return;
+		int count = 0;
+		for(DataHolder data : dataList) {
+			String tsrCode = data.get("tsrCode") != null ? data.get("tsrCode").getStringValue() : null;
+			Date floorDate = (Date) data.get("floorDate").getValue();
+			
+			if(!StringUtils.isBlank(tsrCode)) {
+				DetachedCriteria criteria = DetachedCriteria.forClass(Tsr.class);
+				criteria.add(Restrictions.eq("tsrCode", tsrCode));
+				criteria.addOrder(Order.desc("id"));
+				
+				List<Tsr> list = tsrService.findByCriteria(criteria);
+				if(!list.isEmpty()) {
+					Tsr tsr = list.get(0);
+					tsrService.update(tsr.setFloorDate(floorDate), USER_LOGIN);
+					count++;
+				}
+			}
+		}
+		logger.info("## Total Updated: " + count + " records");
+	}
 }
