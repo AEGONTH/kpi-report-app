@@ -8,7 +8,7 @@
 			
 			<DataCell row="8" column="AC" dataType="TEXT" fieldName="hoursFormat" />
 
-			<DataRecord listSourceName="tsrTrackingList" beginRow="6" endRow="1000">
+			<DataRecord listSourceName="tsrTrackingList" beginRow="8" endRow="1000">
 			
 				<BeginRecordCondition column="A" comparator="EQ" checkValue="1" firstRowAsData="TRUE"/>
 			
@@ -39,7 +39,7 @@
 			
 			<DataCell row="8" column="AC" dataType="TEXT" fieldName="hoursFormat" />
 
-			<DataRecord listSourceName="tsrTrackingList" beginRow="6" endRow="1000">
+			<DataRecord listSourceName="tsrTrackingList" beginRow="8" endRow="1000">
 			
 				<BeginRecordCondition column="A" comparator="EQ" checkValue="1" firstRowAsData="TRUE"/>
 			

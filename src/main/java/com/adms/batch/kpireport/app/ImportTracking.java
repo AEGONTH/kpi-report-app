@@ -29,7 +29,9 @@ public class ImportTracking {
 			
 			logger.info("#### Start Import Data for KPI");
 			if(StringUtils.isBlank(rootPath)) return;
-			logicImportKpi(rootPath, new String[]{"TsrTracking", "TSRTracking", "TSRTRA"}, new String[]{"CTD", "MTD", "DAI_ALL", "QA_Report", "QC_Reconfirm", "SalesReportByRecords"});
+			logicImportKpi(rootPath
+					, new String[]{"TsrTracking", "TSRTracking", "TSRTRA"}
+					, new String[]{"CTD", "MTD", "DAI_ALL", "QA_Report", "QC_Reconfirm", "SalesReportByRecords", "archive"});
 			logger.info("#### Finish Import Data for KPI");
 		} catch(Exception e) {
 			logger.error(e.getMessage(), e);

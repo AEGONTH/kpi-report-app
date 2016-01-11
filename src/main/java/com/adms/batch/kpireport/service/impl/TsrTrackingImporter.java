@@ -15,6 +15,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.util.CellReference;
 import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 
@@ -124,6 +125,7 @@ public class TsrTrackingImporter implements DataImporter {
 	
 	private void logic(DataHolder sheetHolder, String sheetName, boolean isNewTimeFormat) {
 		try {
+			int countImported = 0;
 			if(sheetHolder.get("period") == null || (sheetHolder.get("period") != null && sheetHolder.get("period").getStringValue().isEmpty())) {
 				logger.error("SKIP Sheet: " + sheetName + ", due to cannot get period value");
 				return;
@@ -146,7 +148,7 @@ public class TsrTrackingImporter implements DataImporter {
 			String listLotCode = getListLotCode(listLotName);
 			if(StringUtils.isBlank(listLotCode)) throw new Exception("Cannot get listlot >> " + listLotName + " | period: " + period);
 
-			logger.info("# Retrived: " + datas.size() + " records");
+//			logger.info("# Retrived: " + datas.size() + " records");
 			
 			if(datas.isEmpty()) {
 				return;
@@ -154,7 +156,6 @@ public class TsrTrackingImporter implements DataImporter {
 			
 			for(DataHolder data : datas) {
 				try {
-					
 //					<!-- Checking work day -->
 					Integer workday = Integer.valueOf(data.get("workday").getDecimalValue() != null 
 							? Integer.valueOf(data.get("workday").getDecimalValue().intValue()) : new Integer(0));
@@ -165,8 +166,28 @@ public class TsrTrackingImporter implements DataImporter {
 					}
 					
 //					<!-- getting data -->
+					Tsr tsr = null;
+					String fullName = "";
+					String tsrCode = data.get("tsrCode").getStringValue();
 					String tsrName = data.get("tsrName").getStringValue();
-					if(StringUtils.isEmpty(tsrName)) continue;
+					
+					if(tsrCode.isEmpty() || !tsrCode.isEmpty() && tsrCode.length() != 6) {
+						if(StringUtils.isEmpty(tsrName)) continue;
+//						<!-- get Tsr by name -->
+//						logger.info("tsrCode '" + tsrCode + "' can't be used. Find by Name instead.");
+						fullName = removeTitle(tsrName.replaceAll(" ", "").replaceAll("  ", " "));
+						tsr = getTsrByName(fullName);
+					} else {
+						tsr = getTsrByTsrCode(tsrCode);
+						if(tsr == null) {
+							fullName = removeTitle(tsrName.replaceAll(" ", "").replaceAll("  ", " "));
+							tsr = getTsrByName(fullName);
+						} else {
+							fullName = tsr.getFullName();
+						}
+					}
+
+					if(tsr == null) logger.info("Not found TSR: '" + fullName + "' | listLot: " + listLotCode);
 					
 					Integer listUsed = data.get("listUsed") != null ? data.get("listUsed").getIntValue() : new Integer(0);
 					Integer complete = data.get("complete") != null ? data.get("complete").getIntValue() : new Integer(0);
@@ -180,11 +201,6 @@ public class TsrTrackingImporter implements DataImporter {
 					Integer newUsed = data.get("newUsed") != null ? data.get("newUsed").getIntValue() : 0;
 					Integer totalPolicy = data.get("totalPolicy") != null ? data.get("totalPolicy").getIntValue() : 0;
 					
-//					<!-- get Tsr by name -->
-					String fullName = removeTitle(tsrName.replaceAll(" ", "").replaceAll("  ", " "));
-					Tsr tsr = getTsrByName(fullName);
-					if(tsr == null) logger.info("Not found TSR Code: '" + fullName + "' | listLot: " + listLotCode);
-					
 					Date trackingDate = null;
 					try {
 						trackingDate = DateUtil.convStringToDate(period);
@@ -194,23 +210,22 @@ public class TsrTrackingImporter implements DataImporter {
 						trackingDate = DateUtil.convStringToDate("dd-MM-yyyy", period);
 					}
 					
-					saveTsrTracking(tsr, fullName, trackingDate, listLotCode, workday, listUsed, complete, hours, talkTime, newUsed, totalPolicy);
-					
+					countImported += saveTsrTracking(tsr, fullName, trackingDate, listLotCode, workday, listUsed, complete, hours, talkTime, newUsed, totalPolicy);
 				} catch(Exception e) {
 					logger.error(e.getMessage(), e);
 				}
 			}
-			
+			logger.info("Imported total: " + countImported);
 		} catch(Exception e) {
 			logger.error(e.getMessage(), e);
 		}
 	}
 	
-	private void saveTsrTracking(Tsr tsr, String tsrName, Date trackingDate, String listLotCode, Integer workday, Integer listUsed, Integer complete, BigDecimal hours, BigDecimal talkTime, Integer newUsed, Integer totalPolicy) throws Exception {
+	private int saveTsrTracking(Tsr tsr, String tsrName, Date trackingDate, String listLotCode, Integer workday, Integer listUsed, Integer complete, BigDecimal hours, BigDecimal talkTime, Integer newUsed, Integer totalPolicy) throws Exception {
 		DetachedCriteria isExisted = DetachedCriteria.forClass(TsrTracking.class);
 		isExisted.add(Restrictions.eq("trackingDate", trackingDate));
 		isExisted.add(Restrictions.eq("listLot.listLotCode", listLotCode));
-
+		
 		isExisted.add(Restrictions.disjunction()
 				.add(Restrictions.eq("tsrName", tsrName))
 				.add(Restrictions.eq("tsr.tsrCode", tsr == null ? "" : tsr.getTsrCode())));
@@ -238,6 +253,7 @@ public class TsrTrackingImporter implements DataImporter {
 			tsrTracking.setTotalPolicy(totalPolicy);
 			
 			tsrTrackingService.add(tsrTracking, LOGIN_USER);
+			return 1;
 		} else if(list.size() == 1) {
 			boolean isUpdate = false;
 			
@@ -274,9 +290,24 @@ public class TsrTrackingImporter implements DataImporter {
 			if(isUpdate) {
 				tsrTrackingService.update(tsrTracking, LOGIN_USER);
 			}
+			return 1;
 		} else {
 			throw new Exception("Found tsr tracking more than 1 records b >> " + (tsr == null ? "tsrName: " + tsrName : "tsrCode: " + tsr.getTsrCode()) + " | trackingDate: " + trackingDate + " | Listlot: " + listLotCode);
 		}
+	}
+	
+	private Tsr getTsrByTsrCode(String tsrCode) {
+		DetachedCriteria criteria = DetachedCriteria.forClass(Tsr.class);
+		criteria.add(Restrictions.eq("tsrCode", tsrCode));
+		try {
+			List<Tsr> list = tsrService.findByCriteria(criteria);
+			if(list != null && list.size() == 1) {
+				return list.get(0);
+			}
+		} catch(Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		return null;
 	}
 	
 	private Tsr getTsrByName(String tsrName) {
@@ -317,7 +348,7 @@ public class TsrTrackingImporter implements DataImporter {
 		
 		return null;
 	}
-	
+
 	private String removeTitle(String val) {
 		if(val.startsWith(" ")) val = val.substring(1, val.length());
 		for(String s : titles) {
@@ -352,13 +383,16 @@ public class TsrTrackingImporter implements DataImporter {
 		return result;
 	}
 	
-	private String getFileFormatPath(String fileName) {
+	private String getFileFormatPath(String fileName) throws Exception {
 		if(fileName.contains("OTO")) {
 			return EFileFormat.TSR_TRACKING_OTO.getValue();
 		} else if(fileName.contains("TELE")) {
 			return EFileFormat.TSR_TRACKING_TELE.getValue();
+		} else if(fileName.contains("3RD")) {
+			return EFileFormat.TSR_TRACKING_3RD.getValue();
+		} else {
+			throw new Exception("Cannot find file format for this file. " + "\'" + fileName + "\'");
 		}
-		return "";
 	}
 
 	@Override

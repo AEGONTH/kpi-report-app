@@ -486,10 +486,9 @@ public class KpiReportExporter implements ReportExporter {
 //		<!-- Calculate Grade for DSM -->
 		Cell sumScoreCell = sheet.getRow(sheet.getLastRowNum()).getCell(getColumnIndex("G"), Row.CREATE_NULL_AS_BLANK);
 		Cell gradeCell = sheet.getRow(sheet.getLastRowNum() - 4).createCell(getColumnIndex("H"), Cell.CELL_TYPE_STRING);
-		FormulaEvaluator evaluator = sheet.getWorkbook().getCreationHelper().createFormulaEvaluator();
-		Double score = skip ? null : evaluator.evaluate(sumScoreCell).getNumberValue();
-		gradeCell.setCellValue(getGrade(score));
-		
+//		FormulaEvaluator evaluator = sheet.getWorkbook().getCreationHelper().createFormulaEvaluator();
+//		Double score = skip ? null : evaluator.evaluate(sumScoreCell).getNumberValue();
+		gradeCell.setCellFormula(getGrade(sumScoreCell));
 	}
 	
 	private void logicSupGradeSummary(Sheet tempSheet, Sheet sheet, String supCode, List<String[]> vals) throws Exception {
@@ -730,7 +729,7 @@ public class KpiReportExporter implements ReportExporter {
 		Cell gradeCell = sheet.getRow(sheet.getLastRowNum() - 5).createCell(getColumnIndex("H"), Cell.CELL_TYPE_STRING);
 		FormulaEvaluator evaluator = sheet.getWorkbook().getCreationHelper().createFormulaEvaluator();
 		Double score = skip ? null : evaluator.evaluate(sumScoreCell).getNumberValue();
-		gradeCell.setCellValue(getGrade(score));
+		gradeCell.setCellFormula(getGrade(sumScoreCell));
 		
 //		<!-- Keep score of sup in map. For Sup grade summary -->
 		if(!skip) {
@@ -904,7 +903,7 @@ public class KpiReportExporter implements ReportExporter {
 		Cell gradeCell = sheet.getRow(sheet.getLastRowNum() - 4).createCell(getColumnIndex("H"), Cell.CELL_TYPE_STRING);
 		FormulaEvaluator evaluator = sheet.getWorkbook().getCreationHelper().createFormulaEvaluator();
 		Double score = skip ? null : evaluator.evaluate(sumScoreCell).getNumberValue();
-		gradeCell.setCellValue(getGrade(score));
+		gradeCell.setCellFormula(getGrade(sumScoreCell));
 		
 //		<!-- Keep TSR Grade result for DSM Section -->
 		if(tsrABGradeByDsmMap.get(dsmCode) == null) {
@@ -1141,17 +1140,31 @@ public class KpiReportExporter implements ReportExporter {
 	private InputStream getTemplateStream() {
 		return Thread.currentThread().getContextClassLoader().getResourceAsStream(templateKpiReportPath);
 	}
+	
+	private String getGrade(Cell sumScoreCell) {
+		String formular = "IF(ISBLANK(#SCORE_COL), \"N\\A\""
+				+ ", IF(#SCORE_COL > 0.9,\"A\""
+				+ ", IF(#SCORE_COL > 0.8,\"B\""
+				+ ", IF(#SCORE_COL > 0.6,\"C\""
+				+ ", IF(#SCORE_COL <= 0.6,\"D\")))))";
+		String result = "ERROR_SUM_SCORE_COLUMN_IS_NULL";
+		if(sumScoreCell != null) {
+			String f = CellReference.convertNumToColString(sumScoreCell.getColumnIndex()) + (sumScoreCell.getRowIndex() + 1);
+			result = formular.replaceAll("#SCORE_COL", f);
+		}
+		return result;
+	}
 
 	private String getGrade(Double score) {
 		String grade = "N/A";
 		if(score != null) {
-			if(score > 0.9D) {
+			if(score.compareTo(new Double(0.9)) > 0) {
 				grade = "A";
-			} else if(score > 0.8D) {
+			} else if(score.compareTo(new Double(0.8)) > 0) {
 				grade = "B";
-			} else if(score > 0.6D) {
+			} else if(score.compareTo(new Double(0.6)) > 0) {
 				grade = "C";
-			} else if(score <= 0.6D) {
+			} else if(score.compareTo(new Double(0.8)) <= 0) {
 				grade = "D";
 			}
 		}
