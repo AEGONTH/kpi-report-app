@@ -59,7 +59,7 @@ public class ImportTracking {
 	
 	private static void getExcelByName(String rootPath, String[] containNames, String[] notInNames) {
 		File file = new File(rootPath);
-		if(file.isDirectory()) {
+		if(file.isDirectory() && (!file.getName().contains("archive") || !file.getName().contains("zipfiles"))) {
 			for(File sub : file.listFiles()) {
 				getExcelByName(sub.getAbsolutePath(), containNames, notInNames);
 			}
